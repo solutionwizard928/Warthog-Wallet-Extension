@@ -11,7 +11,7 @@
   --color-whiteTransparent: rgba(255, 255, 255, 0.3);
   --color-error: #fd1e1e;
   --color-warning: #fb3333;
-  --color-background-dark: #ffff;
+  --color-background-dark: #000;
   --color-text-dark: #fdb913;
   --color-link-hover-light: rgba(253, 185, 19, 0.2);
 
@@ -33,8 +33,14 @@
     color: var(--color-text-dark);
     background-color: var(--color-background-dark);
     height: 600px;
-    width: 400px;
+    width: 491px;
   }
+}
+
+html {
+  height: 600px;
+  width: 491px;
+  background-color: black;
 }
 
 body {
@@ -43,16 +49,14 @@ body {
   box-sizing: border-box;
   background-color: black;
   height: 600px;
-  width: 400px;
+  width: 491px;
 }
 
 @layer components {
   .container {
-    max-width: 400px;
-    max-height: 600px;
     width: 100%;
     height: 100%;
     margin: 0 auto;
-    padding: 24px;
+    padding: 20px 15px;
   }
 }

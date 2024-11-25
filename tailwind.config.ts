@@ -13,6 +13,9 @@ export default {
         warning: "#FB3333", // Warning color
         black: "#000000", // Background black color
       },
+      borderRadius: {
+        48: "48px", // Border radius
+      },
       borderColor: {
         lightPrimaryBorder: "rgba(253, 185, 19, 0.1)", // Border color with opacity
       },
