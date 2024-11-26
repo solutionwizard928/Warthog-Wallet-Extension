@@ -10,7 +10,7 @@ function BackButton() {
 
     return (
         <div>
-            <Button onClick={handleClick} variant={'outline'} ariaLabel="Go back" className="h-12 w-12 flex items-center justify-center bg-[#FDB9131A]">
+            <Button onClick={handleClick} variant={'outline'} ariaLabel="Go back" className="h-10 w-10 flex items-center justify-center bg-[#FDB9131A]">
                 <IoIosArrowBack className='text-primary text-xl' />
             </Button>
         </div>

@@ -40,7 +40,6 @@ function ImportPage({ setSeedPhrase, setWallet }: ImportPageProps) {
         setInputWords(updatedWords);
     };
 
-    // Asynchronous wallet recovery with error handling and feedback
     const recoverWallet = async () => {
         setIsProcessing(true);
         setError(null);
@@ -57,6 +56,7 @@ function ImportPage({ setSeedPhrase, setWallet }: ImportPageProps) {
         } catch (e) {
             console.log("Failed to recover wallet:", e);
             setError("Invalid recovery phrase. Please try again.");
+            setIsProcessing(false);
         }
     };
 

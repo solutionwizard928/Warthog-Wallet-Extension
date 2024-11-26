@@ -33,13 +33,13 @@
     color: var(--color-text-dark);
     background-color: var(--color-background-dark);
     height: 600px;
-    width: 491px;
+    width: 410px;
   }
 }
 
 html {
   height: 600px;
-  width: 491px;
+  width: 410px;
   background-color: black;
 }
 
@@ -49,7 +49,7 @@ body {
   box-sizing: border-box;
   background-color: black;
   height: 600px;
-  width: 491px;
+  width: 410px;
 }
 
 @layer components {

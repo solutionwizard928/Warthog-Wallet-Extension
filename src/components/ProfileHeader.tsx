@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { IoSettingsOutline } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
 
 const ProfileHeader: React.FC = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const navigate = useNavigate();
 
     const toggleMenu = () => {
         setIsMenuOpen((prev) => !prev);
@@ -38,7 +40,7 @@ const ProfileHeader: React.FC = () => {
                         <div className="border border-white/20 my-2" />
                         <p className="text-white text-lg font-normal">Manage Accounts</p>
                         <div className="border border-white/20 my-2" />
-                        <p className="text-white text-lg font-normal">Lock Screen</p>
+                        <p className="text-white text-lg font-normal cursor-pointer" onClick={() => navigate('/locked')}>Lock Screen</p>
                     </div>
                 )}
             </div>
