@@ -36,9 +36,9 @@ const ProfileHeader: React.FC = () => {
 
                 {isMenuOpen && (
                     <div className="p-5 bg-[#272727] rounded-[10px] border border-[#fdb913] absolute right-0 w-[210px] mt-2">
-                        <p className="text-white text-lg font-normal">Account details</p>
+                        <p className="text-white text-lg font-normal cursor-pointer" onClick={() => navigate('/account-details')}>Account details</p>
                         <div className="border border-white/20 my-2" />
-                        <p className="text-white text-lg font-normal">Manage Accounts</p>
+                        <p className="text-white text-lg font-normal cursor-pointer" onClick={() => navigate('/manage-account')}>Manage Accounts</p>
                         <div className="border border-white/20 my-2" />
                         <p className="text-white text-lg font-normal cursor-pointer" onClick={() => navigate('/locked')}>Lock Screen</p>
                     </div>

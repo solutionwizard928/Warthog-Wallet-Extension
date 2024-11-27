@@ -13,6 +13,9 @@ import ActivityDetailPage from './pages/ActivityDetailPage';
 import LockScreen from './pages/LockScreen';
 import ReceivePage from './pages/ReceivePage';
 import SendPage from './pages/SendPage';
+import ManageAccounts from './pages/ManageAccounts';
+import AccountDetails from './pages/AccountDetails';
+import ShowPrivateKey from './pages/ShowPrivateKey';
 
 interface Activity {
   date: string;
@@ -59,6 +62,9 @@ const App: React.FC = () => {
       <Route path="/locked" element={<LockScreen password={password} />} />
       <Route path="/receive" element={<ReceivePage wallet={wallet} />} />
       <Route path="/send" element={<SendPage />} />
+      <Route path="/manage-account" element={<ManageAccounts />} />
+      <Route path="/account-details" element={<AccountDetails wallet={wallet} />} />
+      <Route path="/private-key" element={<ShowPrivateKey seedPhrase={seedPhrase} password={password} />} />
     </Routes>
   );
 

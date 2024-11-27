@@ -1,19 +1,39 @@
+import { useState } from "react";
 import Header from "../components/Header";
 
 interface Props {
     wallet: string | null;
 }
 
-const CopyButton = () => (
-    <div className="flex flex-col items-center gap-4">
-        <div className="flex justify-center items-center w-16 h-16 bg-[#f1f1f1] rounded-full cursor-pointer">
-            <img src="icons/Icon-copy.svg" alt="Copy" />
+function IconButton({ iconSrc, label, onClick }: { iconSrc: string; label: string; onClick?: () => void }) {
+    return (
+        <div className="flex flex-col items-center gap-2 cursor-pointer" onClick={onClick}>
+            <div className="flex justify-center items-center w-16 h-16 bg-[#f1f1f1] rounded-full">
+                <img src={iconSrc} alt={label} />
+            </div>
+            <div className="text-sm text-white">{label}</div>
         </div>
-        <div className="text-center text-white text-sm font-light">Copy</div>
-    </div>
-);
+    );
+}
 
 function ReceivePage({ wallet }: Props) {
+    const [copyLabel, setCopyLabel] = useState("Copy");
+
+    const handleCopyAddress = () => {
+        if (wallet) {
+            navigator.clipboard.writeText(wallet)
+                .then(() => {
+                    setCopyLabel("Copied!");
+                    setTimeout(() => setCopyLabel("Copy"), 2000);
+                })
+                .catch((err) => {
+                    console.log("Failed to copy wallet address: ", err);
+                });
+        } else {
+            alert("No wallet connected to copy.");
+        }
+    };
+
     return (
         <div className="min-h-screen container mx-auto px-4">
             <Header title="Receive" />
@@ -34,7 +54,7 @@ function ReceivePage({ wallet }: Props) {
                 </div>
 
                 <div className="flex justify-center gap-12">
-                    <CopyButton />
+                    <IconButton iconSrc="icons/Icon-copy.svg" label={copyLabel} onClick={handleCopyAddress} />
                 </div>
             </div>
         </div>
