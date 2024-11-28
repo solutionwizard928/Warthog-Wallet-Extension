@@ -1,6 +1,6 @@
-import BackButton from "../components/BackButton";
 import Button from "../components/Button";
 import { useNavigate } from "react-router-dom";
+import Header from "../components/Header";
 
 
 function Validate() {
@@ -8,14 +8,11 @@ function Validate() {
 
     return (
         <div className="h-screen container relative">
-            <BackButton />
+            <Header title="Let's double-check" />
             <div className="flex-col justify-start items-start gap-5 inline-flex mt-2">
-                <div className="self-stretch text-center text-white text-xl font-semibold capitalize">
-                    Let's double-check
-                </div>
-                <div className="self-stretch text-center text-white text-sm font-medium leading-tight">
+                <p className="self-stretch text-center text-white text-sm font-medium leading-tight">
                     Well done. Now let's verify that you've written down your recovery phrase correctly. Yes, it's that important.
-                </div>
+                </p>
             </div>
 
 

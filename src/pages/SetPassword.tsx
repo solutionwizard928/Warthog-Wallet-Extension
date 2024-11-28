@@ -2,12 +2,10 @@ import React, { useState } from 'react';
 import BackButton from "../components/BackButton";
 import Button from "../components/Button";
 import { useNavigate } from 'react-router-dom';
+import useWallet from '../hooks/useWallet';
 
-interface SetPasswordProps {
-    setPassword: (password: string) => void;
-}
-
-const SetPassword: React.FC<SetPasswordProps> = ({ setPassword }) => {
+const SetPassword: React.FC = () => {
+    const { setPassword } = useWallet();
     const navigate = useNavigate();
     const [password, setPass] = useState<string>('');
     const [confirmPassword, setConfirmPassword] = useState<string>('');

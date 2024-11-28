@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Button from '../components/Button';
-import BackButton from '../components/BackButton';
+import Header from '../components/Header';
 
 interface ValidateIntroProps {
     recoveryPhrase: string[];
@@ -58,16 +58,11 @@ const ValidateIntro: React.FC<ValidateIntroProps> = ({ recoveryPhrase, onGoBack,
 
     return (
         <div className="container min-h-screen py-5 relative overflow-y-scroll" onPaste={handlePaste}>
-            <BackButton />
-            <div className="flex-col justify-start items-start gap-5 inline-flex mt-3">
-                <h1 className="self-stretch text-center text-white text-xl font-semibold capitalize leading-[30px]">
-                    {isProcessing
-                        ? 'Perfect. Make sure to securely store your recovery phrase.'
-                        : errors.some(error => error)
-                            ? 'Sorry, that’s not correct. Please try again.'
-                            : 'Type the words in the correct order.'}
-                </h1>
-            </div>
+            <Header title={isProcessing
+                ? 'Perfect. Make sure to securely store your recovery phrase.'
+                : errors.some(error => error)
+                    ? 'Sorry, that’s not correct. Please try again.'
+                    : 'Tap the words in the correct order.'} />
             <div className="grid grid-cols-2 justify-start items-start gap-5 my-5">
                 {recoveryPhrase.map((_, index) => (
                     <div key={index} className={`bg-primary/20 rounded-full justify-start items-center inline-flex`}>
@@ -88,12 +83,12 @@ const ValidateIntro: React.FC<ValidateIntroProps> = ({ recoveryPhrase, onGoBack,
                     </div>
                 ))}
             </div>
-            <div className="grid gap-5 w-full">
+            <div className="grid gap-3 w-full grid-cols-2 absolute bottom-3 left-0 px-3">
                 <Button onClick={onGoBack} variant="outline" ariaLabel="Show me again" className="w-full">
                     Show me again
                 </Button>
                 <Button onClick={handleContinueClick} variant="primary" ariaLabel="Continue" className="w-full" disabled={!isCompleted || isProcessing}>
-                    Continue
+                    Verify
                 </Button>
             </div>
         </div>

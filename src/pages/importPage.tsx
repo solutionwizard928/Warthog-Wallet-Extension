@@ -3,13 +3,10 @@ import BackButton from "../components/BackButton";
 import Button from "../components/Button";
 import { ethers } from "ethers";
 import { useNavigate } from "react-router-dom";
+import useWallet from "../hooks/useWallet";
 
-interface ImportPageProps {
-    setSeedPhrase: (seedPhrase: string) => void;
-    setWallet: (wallet: string) => void;
-}
-
-function ImportPage({ setSeedPhrase, setWallet }: ImportPageProps) {
+function ImportPage() {
+    const { setSeedPhrase, setWallet } = useWallet();
     const navigate = useNavigate();
     const [inputWords, setInputWords] = useState<string[]>(Array(12).fill(""));
     const [isProcessing, setIsProcessing] = useState(false);
@@ -40,7 +37,6 @@ function ImportPage({ setSeedPhrase, setWallet }: ImportPageProps) {
         setInputWords(updatedWords);
     };
 
-    // Asynchronous wallet recovery with error handling and feedback
     const recoverWallet = async () => {
         setIsProcessing(true);
         setError(null);
@@ -57,6 +53,7 @@ function ImportPage({ setSeedPhrase, setWallet }: ImportPageProps) {
         } catch (e) {
             console.log("Failed to recover wallet:", e);
             setError("Invalid recovery phrase. Please try again.");
+            setIsProcessing(false);
         }
     };
 

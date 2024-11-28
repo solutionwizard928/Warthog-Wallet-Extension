@@ -1,7 +1,7 @@
 import React from 'react';
-import BackButton from '../components/BackButton';
 import Button from '../components/Button';
 import { useNavigate } from 'react-router-dom';
+import Header from '../components/Header';
 
 interface RecoveryPhaseProps {
     mnemonic: string | null;
@@ -22,15 +22,12 @@ const RecoveryPhase: React.FC<RecoveryPhaseProps> = ({ mnemonic }) => {
     };
 
     return (
-        <div className="min-h-screen container">
-            <BackButton />
+        <div className="min-h-screen container relative">
+            <Header title="This is your recovery phrase" />
             <div className="flex-col justify-start items-start gap-5 inline-flex mt-2">
-                <div className="self-stretch text-center text-white text-xl font-semibold capitalize">
-                    This is your recovery phrase
-                </div>
-                <div className="self-stretch text-center text-white text-sm font-medium leading-tight">
+                <p className="self-stretch text-center text-white text-sm font-medium leading-tight">
                     Make sure to write it down as shown here. You have to verify this later.
-                </div>
+                </p>
             </div>
 
             <div className="mt-5">
@@ -48,12 +45,12 @@ const RecoveryPhase: React.FC<RecoveryPhaseProps> = ({ mnemonic }) => {
                     ))}
                 </div>
             </div>
-            <div>
+            <div className='flex bottom-3 absolute left-0 px-3 w-full gap-3'>
                 <Button variant="outline" ariaLabel="Backup" className="w-full mt-5 hover:bg-primary/10" onClick={handleBackup}>
                     Backup
                 </Button>
                 <Button variant="primary" ariaLabel="Continue" className="w-full mt-5" onClick={() => navigate('/validate')}>
-                    Continue
+                    Verify
                 </Button>
             </div>
         </div>
