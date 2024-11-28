@@ -1,15 +1,12 @@
-import { useCallback } from "react"
-import BackButton from "../components/BackButton"
-import Button from "../components/Button"
-import { useNavigate } from "react-router-dom"
-import { ethers } from "ethers"
+import React, { useCallback } from 'react';
+import BackButton from '../components/BackButton';
+import Button from '../components/Button';
+import { useNavigate } from 'react-router-dom';
+import { ethers } from 'ethers';
+import useWallet from '../hooks/useWallet';
 
-interface InfoProps {
-    setSeedPhrase: (seedPhrase: string) => void;
-    setWallet: (wallet: string) => void;
-}
-
-function Info({ setSeedPhrase, setWallet }: InfoProps) {
+const Info: React.FC = () => {
+    const { setSeedPhrase, setWallet } = useWallet();
     const navigate = useNavigate();
 
     const generateWallet = useCallback(async () => {
@@ -18,7 +15,6 @@ function Info({ setSeedPhrase, setWallet }: InfoProps) {
         setSeedPhrase(mnemonic);
         const newWallet = ethers.Wallet.fromPhrase(mnemonic).address;
         setWallet(newWallet);
-        localStorage.removeItem('inputWordsBackup');
         navigate('/recover');
     }, [navigate, setSeedPhrase, setWallet]);
 
@@ -31,17 +27,16 @@ function Info({ setSeedPhrase, setWallet }: InfoProps) {
                     recovery phrase
                 </h3>
                 <p className="text-sm font-medium text-center text-white">
-                    A recovery phrase is a series of 12 words in a specific order.
-                    This word combination is unique to your wallet. Make sure
-                    to have pen and paper ready so you can write it down.
+                    A recovery phrase is a series of 12 words in a specific order. This word combination is unique to your wallet. Make sure to have pen and paper ready so you can write it down.
                 </p>
             </div>
-            <div className='absolute bottom-5 left-0 px-6 w-full'>
-                <Button onClick={generateWallet} variant={'primary'} ariaLabel="Continue" className="w-full">
+            <div className="absolute bottom-5 left-0 px-6 w-full">
+                <Button onClick={generateWallet} variant="primary" ariaLabel="Continue" className="w-full">
                     Continue
                 </Button>
             </div>
-        </div >
-    )
-}
-export default Info
+        </div>
+    );
+};
+
+export default Info;

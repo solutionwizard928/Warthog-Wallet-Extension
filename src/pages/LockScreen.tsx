@@ -1,12 +1,10 @@
 import React, { useState } from "react";
 import Button from "../components/Button";
 import { useNavigate } from "react-router-dom";
+import useWallet from "../hooks/useWallet";
 
-interface Props {
-    password: string | null;
-}
-
-function LockScreen({ password }: Props) {
+function LockScreen() {
+    const { password } = useWallet();
     const [enteredPassword, setEnteredPassword] = useState("");
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();

@@ -16,6 +16,7 @@ import SendPage from './pages/SendPage';
 import ManageAccounts from './pages/ManageAccounts';
 import AccountDetails from './pages/AccountDetails';
 import ShowPrivateKey from './pages/ShowPrivateKey';
+import useWallet from './hooks/useWallet';
 
 interface Activity {
   date: string;
@@ -25,11 +26,9 @@ interface Activity {
 }
 
 const App: React.FC = () => {
+  const { seedPhrase, wallet, password } = useWallet();
   const [progress, setProgress] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [seedPhrase, setSeedPhrase] = useState<string | null>(null);
-  const [wallet, setWallet] = useState<string | null>(null);
-  const [password, setPassword] = useState<string | null>(null);
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
   const navigate = useNavigate();
 
@@ -57,26 +56,27 @@ const App: React.FC = () => {
 
   const AuthenticatedRoutes = () => (
     <Routes>
-      <Route path="/home" element={<Home wallet={wallet} setSelectedActivity={setSelectedActivity} />} />
+      <Route path="/home" element={<Home setSelectedActivity={setSelectedActivity} />} />
       <Route path="/activity-details" element={<ActivityDetailPage selectedActivity={selectedActivity} />} />
-      <Route path="/locked" element={<LockScreen password={password} />} />
-      <Route path="/receive" element={<ReceivePage wallet={wallet} />} />
+      <Route path="/locked" element={<LockScreen />} />
+      <Route path="/" element={<LockScreen />} />
+      <Route path="/receive" element={<ReceivePage />} />
       <Route path="/send" element={<SendPage />} />
       <Route path="/manage-account" element={<ManageAccounts />} />
-      <Route path="/account-details" element={<AccountDetails wallet={wallet} />} />
-      <Route path="/private-key" element={<ShowPrivateKey seedPhrase={seedPhrase} password={password} />} />
+      <Route path="/account-details" element={<AccountDetails />} />
+      <Route path="/private-key" element={<ShowPrivateKey />} />
     </Routes>
   );
 
   const UnauthenticatedRoutes = () => (
     <Routes>
       <Route path="/" element={<Start />} />
-      <Route path="/intro" element={<Intro setSeedPhrase={setSeedPhrase} setWallet={setWallet} />} />
-      <Route path="/import" element={<ImportPage setSeedPhrase={setSeedPhrase} setWallet={setWallet} />} />
+      <Route path="/intro" element={<Intro />} />
+      <Route path="/import" element={<ImportPage />} />
       <Route path="/recover" element={<RecoveryPhase mnemonic={seedPhrase} />} />
       <Route path="/validate" element={<Validate />} />
       <Route path="/validate-intro" element={<ValidateIntro recoveryPhrase={seedPhrase?.split(' ') || []} onGoBack={() => navigate(-2)} onComplete={() => navigate('/set-password')} />} />
-      <Route path="/set-password" element={<SetPassword setPassword={setPassword} />} />
+      <Route path="/set-password" element={<SetPassword />} />
     </Routes>
   );
 

@@ -7,6 +7,7 @@ import TabNavigation from '../components/TabNavigation';
 import TokenItem from '../components/TokenItem';
 import ActivityItem from '../components/ActivityItem';
 import { useNavigate } from 'react-router-dom';
+import useWallet from '../hooks/useWallet';
 
 interface Activity {
     date: string;
@@ -16,7 +17,6 @@ interface Activity {
 }
 
 interface Props {
-    wallet: string | null;
     setSelectedActivity: (activity: Activity) => void;
 }
 
@@ -34,7 +34,8 @@ const activities: Activity[] = [
     },
 ];
 
-const Home: React.FC<Props> = ({ wallet, setSelectedActivity }) => {
+const Home: React.FC<Props> = ({ setSelectedActivity }) => {
+    const { wallet } = useWallet();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<Tab>(Tab.Tokens);
     const [isCopied, setIsCopied] = useState(false);

@@ -1,11 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import BackButton from "../components/BackButton";
 import Button from "../components/Button";
 import { useNavigate } from "react-router-dom";
-
-interface AccountDetailsProps {
-    wallet: string | null;
-}
+import useWallet from "../hooks/useWallet";
 
 function IconButton({ iconSrc, label, onClick }: { iconSrc: string; label: string; onClick?: () => void }) {
     return (
@@ -18,8 +15,23 @@ function IconButton({ iconSrc, label, onClick }: { iconSrc: string; label: strin
     );
 }
 
-function AccountDetails({ wallet }: AccountDetailsProps) {
+function useDebounce(value: string | null, delay: number): string | null {
+    const [debouncedValue, setDebouncedValue] = useState(value);
+
+    useEffect(() => {
+        const handler = setTimeout(() => setDebouncedValue(value), delay);
+        return () => clearTimeout(handler);
+    }, [value, delay]);
+
+    return debouncedValue;
+}
+
+function AccountDetails() {
+    const { wallet, name, setName } = useWallet();
     const [copyLabel, setCopyLabel] = useState("Copy");
+    const [isEditing, setIsEditing] = useState(false);
+    const [tempName, setTempName] = useState<string | null>(name);
+    const debouncedName = useDebounce(tempName, 1000);
     const navigate = useNavigate();
 
     const handleCopyAddress = () => {
@@ -37,6 +49,16 @@ function AccountDetails({ wallet }: AccountDetailsProps) {
         }
     };
 
+    const handleEditClick = () => {
+        setIsEditing(true);
+    };
+
+    useEffect(() => {
+        if (debouncedName !== name) {
+            setName(debouncedName || "");
+        }
+    }, [debouncedName, name, setName]);
+
     return (
         <div className="min-h-screen container">
             <BackButton />
@@ -48,10 +70,29 @@ function AccountDetails({ wallet }: AccountDetailsProps) {
                     alt="Profile"
                 />
                 <div>
-                    <div className="text-xl font-semibold text-white">Hey, Jazie</div>
+                    <div className="text-xl font-semibold text-white">
+                        Hey, {isEditing ? (
+                            <input
+                                type="text"
+                                value={tempName || ""}
+                                onChange={(e) => setTempName(e.target.value)}
+                                onBlur={() => setIsEditing(false)} // Exit edit mode on blur
+                                className="text-xl font-semibold text-white bg-transparent border-b border-white focus:outline-none max-w-28"
+                                autoFocus
+                                placeholder="Your Name"
+                            />
+                        ) : (
+                            name || ""
+                        )}
+                    </div>
                     <div className="text-xs text-white/50">Connected Wallet</div>
                 </div>
-                <img className="w-6 h-6 cursor-pointer" src="icons/edit-2.svg" alt="Edit Profile" />
+                <img
+                    className="w-6 h-6 cursor-pointer"
+                    src="icons/edit-2.svg"
+                    alt="Edit Profile"
+                    onClick={handleEditClick}
+                />
             </div>
 
             <div className="bg-gray-800 p-6 rounded-lg border border-gray-600 flex flex-col items-center gap-4 mt-6">

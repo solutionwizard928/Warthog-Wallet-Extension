@@ -1,9 +1,9 @@
 import Header from "../components/Header";
-// import Button from "../components/Button";
-// import { useNavigate } from "react-router-dom";
+import Button from "../components/Button";
+import { useNavigate } from "react-router-dom";
 
 function SendPage() {
-    // const navigate = useNavigate();
+    const navigate = useNavigate();
     return (
         <div className="min-h-screen container">
             <Header title="Send" />
@@ -45,6 +45,15 @@ function SendPage() {
                         <p className="text-gray-400 text-sm">0 Wart</p>
                     </div>
                 </div>
+            </div>
+
+            <div className='flex bottom-3 absolute left-0 px-3 w-full gap-3'>
+                <Button variant="outline" ariaLabel="Backup" className="w-full mt-5 hover:bg-primary/10" onClick={() => navigate('/home')}>
+                    Cancel
+                </Button>
+                <Button variant="primary" ariaLabel="Continue" className="w-full mt-5" onClick={() => { }}>
+                    Continue
+                </Button>
             </div>
         </div >
     );

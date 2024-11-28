@@ -2,13 +2,11 @@ import React, { useState } from "react";
 import Button from "../components/Button";
 import Header from "../components/Header";
 import { useNavigate } from "react-router-dom";
+import useWallet from "../hooks/useWallet";
 
-interface ShowPrivateKeyProps {
-    seedPhrase: string | null;
-    password: string | null;
-}
 
-function ShowPrivateKey({ seedPhrase, password }: ShowPrivateKeyProps) {
+function ShowPrivateKey() {
+    const { password, seedPhrase, name } = useWallet();
     const navigate = useNavigate();
     const [enteredPassword, setEnteredPassword] = useState("");
     const [error, setError] = useState<string | null>(null);
@@ -45,7 +43,7 @@ function ShowPrivateKey({ seedPhrase, password }: ShowPrivateKeyProps) {
                     alt="Profile"
                 />
                 <div>
-                    <div className="text-xl font-semibold text-white">Hey, Jazie</div>
+                    <div className="text-xl font-semibold text-white">Hey, {name}</div>
                     <div className="text-xs text-white/50">Connected Wallet</div>
                 </div>
             </div>

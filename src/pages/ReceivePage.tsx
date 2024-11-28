@@ -1,9 +1,7 @@
 import { useState } from "react";
 import Header from "../components/Header";
-
-interface Props {
-    wallet: string | null;
-}
+import useWallet from "../hooks/useWallet";
+import { QRCodeSVG } from 'qrcode.react';
 
 function IconButton({ iconSrc, label, onClick }: { iconSrc: string; label: string; onClick?: () => void }) {
     return (
@@ -16,7 +14,8 @@ function IconButton({ iconSrc, label, onClick }: { iconSrc: string; label: strin
     );
 }
 
-function ReceivePage({ wallet }: Props) {
+function ReceivePage() {
+    const { wallet } = useWallet();
     const [copyLabel, setCopyLabel] = useState("Copy");
 
     const handleCopyAddress = () => {
@@ -39,8 +38,18 @@ function ReceivePage({ wallet }: Props) {
             <Header title="Receive" />
             <div className="bg-gray-800 p-5 rounded-lg border border-primary/50 flex flex-col items-center gap-5 mt-5">
                 <div className="flex flex-col items-center gap-6">
-                    <img src="qrCode.png" alt="QR Code to receive payment" className="w-32 h-32" />
-                    <div className="text-white text-sm font-light">{wallet}</div>
+                    {wallet ? (
+                        <QRCodeSVG
+                            value={wallet}
+                            size={128}
+                            bgColor="#ffffff"
+                            fgColor="#000000"
+                            level="H"
+                        />
+                    ) : (
+                        <p className="text-gray-500 text-sm">No wallet connected</p>
+                    )}
+                    <div className="text-white text-sm font-light">{wallet || "No wallet connected"}</div>
                 </div>
             </div>
             <div className="mt-8 flex flex-col items-center gap-8">

@@ -3,13 +3,10 @@ import BackButton from "../components/BackButton";
 import Button from "../components/Button";
 import { ethers } from "ethers";
 import { useNavigate } from "react-router-dom";
+import useWallet from "../hooks/useWallet";
 
-interface ImportPageProps {
-    setSeedPhrase: (seedPhrase: string) => void;
-    setWallet: (wallet: string) => void;
-}
-
-function ImportPage({ setSeedPhrase, setWallet }: ImportPageProps) {
+function ImportPage() {
+    const { setSeedPhrase, setWallet } = useWallet();
     const navigate = useNavigate();
     const [inputWords, setInputWords] = useState<string[]>(Array(12).fill(""));
     const [isProcessing, setIsProcessing] = useState(false);

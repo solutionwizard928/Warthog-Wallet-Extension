@@ -10,7 +10,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => (
         <div className="absolute left-2">
             <BackButton />
         </div>
-        <p className="text-center text-white text-base font-semibold capitalize leading-tight">{title}</p>
+        <p className="text-center text-white text-base font-semibold capitalize leading-tight max-w-64">{title}</p>
     </div>
 );
 
