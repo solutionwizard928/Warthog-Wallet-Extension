@@ -1,7 +1,8 @@
 import React, { createContext, useState, useEffect, ReactNode } from "react";
-import CryptoJS from "crypto-js";
 import * as bip39 from "bip39";
 import * as elliptic from "elliptic";
+import CryptoJS from "crypto-js";
+import Ripemd160 from "ripemd160";
 
 declare const chrome: {
     storage: {
@@ -91,40 +92,35 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         }
     };
 
-    const newWallet = (): void => {
+    const newWallet = async (): Promise<void> => {
         try {
             console.log("-------------- newWallet --------------");
             // mnemonic 12 words
             const mnemonic = bip39.generateMnemonic();
-            for (let i = 0; i < 10; i++) {
-                const seed = bip39.mnemonicToSeedSync(mnemonic, `account${i}`);
-                console.log("***** mnemonic", mnemonic);
-                console.log("***** seed", seed);
+            console.log("***** mnemonic", mnemonic);
 
-                const ec = new elliptic.ec("secp256k1");
-                const key = ec.keyFromPrivate(seed.toString("hex"));
+            const ec = new elliptic.ec("secp256k1");
+            const key = ec.genKeyPair({ entropy: bip39.mnemonicToSeedSync(mnemonic) });
 
-                const privateKey = key.getPrivate().toString("hex");
-                const publicKey = key.getPublic().encode("hex", true);
-                console.log("***** privateKey", privateKey);
-                console.log("***** publicKey", publicKey);
-            }
+            const privateKey = key.getPrivate().toString("hex");
+            const publicKey = key.getPublic().encode("hex", true);
+            console.log("***** privateKey", privateKey);
+            console.log("***** publicKey", publicKey);
 
-            // hdkey & derive
-            // const hdNode = hdkey.fromMasterSeed(seed);
-            // const path = "m/70'/40'/0/0";
-            // const derivedNode = hdNode.derive(path);
+            const sha = await window.crypto.subtle.digest('SHA-256', Buffer.from(publicKey, "hex"));
+            const shaHex = Array.from(new Uint8Array(sha)).map(b => b.toString(16).padStart(2, '0')).join('');
+            console.log("***** sha", shaHex);
+            // const tmp = new Ripemd160();
+            // const ripemd160 = tmp.update('42').digest("hex");
+            // console.log("***** ripemd160", ripemd160);
+            // const ripemd160Hex = Array.from(new Uint8Array(ripemd160)).map(b => b.toString(16).padStart(2, '0')).join('');
+            // console.log("***** ripemd160", ripemd160Hex);
+            // const checksum = await window.crypto.subtle.digest('SHA-256', ripemd160);
+            // const checksumHex = Array.from(new Uint8Array(checksum)).map(b => b.toString(16).padStart(2, '0')).join('');
+            // console.log("***** checksum", checksumHex);
+            // const address = ripemd160Hex + checksumHex.slice(0, 8);
+            // // const address = Buffer.concat([ripemd160, checksum.slice(0, 4)]);
 
-            // // child node 0
-            // const childNode0 = derivedNode.derive("0/0");
-            // console.log("***** childNode0PrivateKey", childNode0.privateKey.toString("hex"));
-            // console.log("***** childNode0PublicKey", childNode0.publicKey.toString("hex"));
-
-            // // ec & address
-            // const ec = new elliptic.ec("secp256k1");
-            // const key = ec.keyFromPrivate(childNode0.privateKey.toString("hex"));
-            // const address = key.getPublic().encode("hex");
-            // console.log("***** key", key);
             // console.log("***** address", address);
 
             // save to chrome storage
