@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import Button from "../components/Button";
 import { useNavigate } from "react-router-dom";
 import useWallet from "../hooks/useWallet";
+import CryptoJS from "crypto-js";
 
 function LockScreen() {
-    const { password } = useWallet();
+    const { password, setToken } = useWallet();
     const [enteredPassword, setEnteredPassword] = useState("");
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
@@ -15,11 +16,20 @@ function LockScreen() {
 
     const handleSubmit = () => {
         if (enteredPassword === password) {
+            const token = CryptoJS.SHA256(password + Date.now().toString()).toString();
+            setToken(token);
             navigate("/home");
         } else {
             setError("Incorrect password. Please try again.");
         }
     };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter") {
+            handleSubmit();
+        }
+    };
+
 
     return (
         <div className="min-h-screen container relative">
@@ -47,6 +57,7 @@ function LockScreen() {
                             }`}
                         placeholder="Your password..."
                         value={enteredPassword}
+                        onKeyDown={handleKeyDown}
                         onChange={handlePasswordChange}
                     />
                     {error && <div className="text-red-500 text-sm mt-2">{error}</div>}

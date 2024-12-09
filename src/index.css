@@ -43,6 +43,19 @@ html {
   background-color: black;
 }
 
+html::-webkit-scrollbar {
+  display: none;
+}
+html {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.overflow-y-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
 body {
   margin: 0;
   padding: 0;

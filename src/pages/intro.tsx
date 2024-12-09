@@ -1,22 +1,28 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import BackButton from '../components/BackButton';
 import Button from '../components/Button';
 import { useNavigate } from 'react-router-dom';
-import { ethers } from 'ethers';
 import useWallet from '../hooks/useWallet';
 
 const Info: React.FC = () => {
-    const { setSeedPhrase, setWallet } = useWallet();
+    const { setSeedPhrase, setWallet, newWallet } = useWallet();
     const navigate = useNavigate();
 
-    const generateWallet = useCallback(async () => {
-        const wallet = ethers.Wallet.createRandom();
-        const mnemonic = wallet.mnemonic?.phrase || '';
-        setSeedPhrase(mnemonic);
-        const newWallet = ethers.Wallet.fromPhrase(mnemonic).address;
-        setWallet(newWallet);
+    // const generateWallet = useCallback(async () => {
+    //     const wallet = ethers.Wallet.createRandom();
+    //     const mnemonic = wallet.mnemonic?.phrase || '';
+    //     setSeedPhrase(mnemonic);
+    //     const newWallet = ethers.Wallet.fromPhrase(mnemonic).address;
+    //     setWallet(newWallet);
+    //     navigate('/recover');
+    // }, [navigate, setSeedPhrase, setWallet]);
+
+    const generateWallet = () => {
+        newWallet();
         navigate('/recover');
-    }, [navigate, setSeedPhrase, setWallet]);
+        setSeedPhrase('');
+        setWallet('');
+    };
 
     return (
         <div className="container min-h-screen py-5 relative">

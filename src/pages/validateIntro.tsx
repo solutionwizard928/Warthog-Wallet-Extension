@@ -43,6 +43,12 @@ const ValidateIntro: React.FC<ValidateIntroProps> = ({ recoveryPhrase, onGoBack,
         setIsCompleted(updatedWords.every((word) => word.trim() !== ''));
     };
 
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            handleContinueClick();
+        }
+    };
+
     const handleContinueClick = () => {
         const newErrors = inputWords.map((word, idx) => word.trim() !== recoveryPhrase[idx]);
         setErrors(newErrors);
@@ -77,6 +83,7 @@ const ValidateIntro: React.FC<ValidateIntroProps> = ({ recoveryPhrase, onGoBack,
                                 title={`Recovery phrase word ${index + 1}`}
                                 placeholder=""
                                 value={inputWords[index]}
+                                onKeyDown={handleKeyDown}
                                 onChange={(e) => handleInputChange(index, e.target.value)}
                             />
                         </div>

@@ -49,7 +49,7 @@ function ReceivePage() {
                     ) : (
                         <p className="text-gray-500 text-sm">No wallet connected</p>
                     )}
-                    <div className="text-white text-sm font-light">{wallet || "No wallet connected"}</div>
+                    <span className="text-white text-sm font-light hover:underline cursor-pointer" onClick={handleCopyAddress}>{wallet || "No wallet connected"}</span>
                 </div>
             </div>
             <div className="mt-8 flex flex-col items-center gap-8">

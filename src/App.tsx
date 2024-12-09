@@ -17,6 +17,7 @@ import ManageAccounts from './pages/ManageAccounts';
 import AccountDetails from './pages/AccountDetails';
 import ShowPrivateKey from './pages/ShowPrivateKey';
 import useWallet from './hooks/useWallet';
+import SendFinalStep from './pages/Sendstep2';
 
 interface Activity {
   date: string;
@@ -26,7 +27,7 @@ interface Activity {
 }
 
 const App: React.FC = () => {
-  const { seedPhrase, wallet, password } = useWallet();
+  const { seedPhrase, wallet, password, token, clearToken } = useWallet();
   const [progress, setProgress] = useState(0);
   const [loading, setLoading] = useState(true);
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
@@ -37,12 +38,12 @@ const App: React.FC = () => {
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(interval);
-          setTimeout(() => setLoading(false), 500);
+          setTimeout(() => setLoading(false), 100);
           return 100;
         }
-        return prev + 2;
+        return prev + 5;
       });
-    }, 100);
+    }, 10);
 
     return () => clearInterval(interval);
   }, []);
@@ -52,16 +53,28 @@ const App: React.FC = () => {
     return clear;
   }, [startLoading]);
 
+  useEffect(() => {
+    if (seedPhrase && wallet && password) {
+      if (!token) {
+        clearToken();
+        navigate("/locked");
+      }
+    }
+  }, [token, clearToken, navigate, seedPhrase, wallet, password]);
+
   if (loading) return <Loading progress={progress} />;
+
 
   const AuthenticatedRoutes = () => (
     <Routes>
+      <Route path="/" element={<Home setSelectedActivity={setSelectedActivity} />} />
       <Route path="/home" element={<Home setSelectedActivity={setSelectedActivity} />} />
       <Route path="/activity-details" element={<ActivityDetailPage selectedActivity={selectedActivity} />} />
       <Route path="/locked" element={<LockScreen />} />
-      <Route path="/" element={<LockScreen />} />
+      {/* <Route path="" element={<LockScreen />} /> */}
       <Route path="/receive" element={<ReceivePage />} />
       <Route path="/send" element={<SendPage />} />
+      <Route path="/sendstep2" element={<SendFinalStep />} />
       <Route path="/manage-account" element={<ManageAccounts />} />
       <Route path="/account-details" element={<AccountDetails />} />
       <Route path="/private-key" element={<ShowPrivateKey />} />

@@ -60,7 +60,7 @@ function AccountDetails() {
     }, [debouncedName, name, setName]);
 
     return (
-        <div className="min-h-screen container">
+        <div className="min-h-screen container relative">
             <BackButton />
 
             <div className="flex justify-center items-center gap-4 mt-6">

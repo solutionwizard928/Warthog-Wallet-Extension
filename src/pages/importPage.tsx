@@ -1,12 +1,11 @@
 import { useState, useCallback } from "react";
 import BackButton from "../components/BackButton";
 import Button from "../components/Button";
-import { ethers } from "ethers";
 import { useNavigate } from "react-router-dom";
-import useWallet from "../hooks/useWallet";
+// import useWallet from "../hooks/useWallet";
 
 function ImportPage() {
-    const { setSeedPhrase, setWallet } = useWallet();
+    // const { setSeedPhrase, setWallet } = useWallet();
     const navigate = useNavigate();
     const [inputWords, setInputWords] = useState<string[]>(Array(12).fill(""));
     const [isProcessing, setIsProcessing] = useState(false);
@@ -43,10 +42,11 @@ function ImportPage() {
 
         try {
             const seedPhrase = inputWords.join(" ");
-            const wallet = ethers.Wallet.fromPhrase(seedPhrase);
+            console.log('seedPhrase', seedPhrase);
+            // const wallet = ;
 
-            setSeedPhrase(seedPhrase);
-            setWallet(wallet.address);
+            // setSeedPhrase(seedPhrase);
+            // setWallet(wallet.address);
             setTimeout(() => {
                 navigate("/set-password");
             }, 3000);
