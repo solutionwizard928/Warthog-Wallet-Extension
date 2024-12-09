@@ -1,102 +1,17 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import Button from "../components/Button";
 import Header from "../components/Header";
-import { IoMdMore } from "react-icons/io";
+import AccountCard from "../components/AccountCard";
 import useWallet from "../hooks/useWallet";
-
-const AccountCard = ({
-    name,
-    address,
-    balance,
-    balanceUSD,
-    isLast,
-    setPrimaryAccount,
-}: {
-    name: string;
-    address: string;
-    balance: string;
-    balanceUSD: string;
-    isLast: boolean;
-    setPrimaryAccount: (name: string) => void;
-}) => {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const menuRef = useRef<HTMLDivElement>(null);
-    const buttonRef = useRef<HTMLDivElement>(null);
-
-    // Close the menu if clicked outside
-    useEffect(() => {
-        function handleClickOutside(event: MouseEvent) {
-            if (
-                menuRef.current && !menuRef.current.contains(event.target as Node) &&
-                buttonRef.current && !buttonRef.current.contains(event.target as Node)
-            ) {
-                setIsMenuOpen(false);
-            }
-        }
-
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, []);
-
-    return (
-        <>
-            <div className="flex justify-between items-center w-full mt-6 relative">
-                <div className="flex items-center gap-4">
-                    <img
-                        className="w-12 h-12 rounded-full object-cover"
-                        src="profile-image.png"
-                        alt={`${name} Profile`}
-                    />
-                    <div>
-                        <div className="text-white text-xl font-semibold">{name}</div>
-                        <div className="text-white/50 text-xs">{address}</div>
-                    </div>
-                </div>
-                <div className="flex items-center gap-3">
-                    <div className="flex flex-col items-end">
-                        <div className="text-white text-xl font-medium">{balance}</div>
-                        <div className="text-white/50 text-lg">{balanceUSD}</div>
-                    </div>
-                    <div
-                        ref={buttonRef}
-                        className="text-white text-3xl cursor-pointer"
-                        onClick={() => setIsMenuOpen((prev) => !prev)}
-                    >
-                        <IoMdMore />
-                    </div>
-                </div>
-                {isMenuOpen && (
-                    <div
-                        ref={menuRef}
-                        className="p-3 top-8 z-10 bg-[#272727] rounded-[10px] border border-[#fdb913] absolute right-0 w-[210px] mt-2"
-                    >
-                        <p
-                            className="text-white text-lg font-normal cursor-pointer"
-                            onClick={() => {
-                                setPrimaryAccount(name);
-                                setIsMenuOpen(false);
-                            }}
-                        >
-                            Primary Account
-                        </p>
-                    </div>
-                )}
-            </div>
-            {!isLast && <div className="h-[0px] border border-white/20 my-3" />}
-        </>
-    );
-};
 
 function ManageAccounts() {
     const { setName } = useWallet();
 
-    const accounts = [
+    const [accounts, setAccounts] = useState([
         { name: "Jazie Doe", address: "0x05c4...1sa5cfas", balance: "0.00", balanceUSD: "$0.00" },
         { name: "John Smith", address: "0x1234...abcd", balance: "1.23", balanceUSD: "$123.45" },
         { name: "Alice Brown", address: "0xabcd...1234", balance: "5.67", balanceUSD: "$567.89" },
-    ];
+    ]);
 
     const [searchQuery, setSearchQuery] = useState("");
 
@@ -111,8 +26,15 @@ function ManageAccounts() {
         setName(name);
     }
 
+    function removeAccount(name: string) {
+        setAccounts((prevAccounts) =>
+            prevAccounts.filter((account) => account.name !== name)
+        );
+        console.log(`${name} removed from accounts`);
+    }
+
     return (
-        <div className="min-h-screen container px-4">
+        <div className="min-h-screen container relative px-4">
             <Header title="Select an Account" />
             <div className="relative w-full">
                 <input
@@ -127,7 +49,7 @@ function ManageAccounts() {
                     alt="Search Icon"
                 />
             </div>
-            <div className="h-[60vh] overflow-y-scroll">
+            <div className="h-[63vh] overflow-y-scroll">
                 {filteredAccounts.length > 0 ? (
                     filteredAccounts.map((account, index) => (
                         <AccountCard
@@ -135,6 +57,7 @@ function ManageAccounts() {
                             {...account}
                             isLast={index === filteredAccounts.length - 1}
                             setPrimaryAccount={setPrimaryAccount}
+                            removeAccount={removeAccount}
                         />
                     ))
                 ) : (

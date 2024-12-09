@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import { viteStaticCopy } from "vite-plugin-static-copy";
+import { nodePolyfills } from "vite-plugin-node-polyfills";
 
 export default defineConfig({
   plugins: [
@@ -12,6 +13,14 @@ export default defineConfig({
           dest: ".",
         },
       ],
+    }),
+    nodePolyfills({
+      include: ["buffer"],
+      globals: {
+        Buffer: true,
+        process: true,
+        global: true,
+      },
     }),
   ],
   build: {

@@ -56,6 +56,7 @@ const SetPassword: React.FC = () => {
                         className="w-full bg-primary/10 placeholder:text-sm text-white border border-primary/50 rounded-lg px-4 py-2 mt-1 focus-visible:outline-primary"
                         placeholder="Your password..."
                         value={confirmPassword}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                     />
                     {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}

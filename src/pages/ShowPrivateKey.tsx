@@ -32,6 +32,12 @@ function ShowPrivateKey() {
         }
     };
 
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter") {
+            handleSubmit();
+        }
+    }
+
     return (
         <div className="container min-h-screen flex flex-col items-center">
             <Header title="Show Private Key" />
@@ -59,6 +65,7 @@ function ShowPrivateKey() {
                         placeholder="Your password..."
                         value={enteredPassword}
                         onChange={handlePasswordChange}
+                        onKeyDown={handleKeyDown}
                     />
                     {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
                 </div>
@@ -74,7 +81,7 @@ function ShowPrivateKey() {
 
                     <p className="mt-4 px-2.5 py-2 bg-[#d9d9d9]/10 rounded-lg">
                         <span className="text-[#fa3333] text-sm font-normal">Warning: </span>
-                        <span className="text-white/80 text-sm">Never disclose this key to anyone. Your private keys can steal any assets held in your account.</span>
+                        <span className="text-white/80 text-sm">Never disclose this key to anyone. Your private keys can be used to steal any assets held in your account.</span>
                     </p>
                 </div>
             )}
