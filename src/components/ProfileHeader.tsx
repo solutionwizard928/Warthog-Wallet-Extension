@@ -5,7 +5,7 @@ import useWallet from "../hooks/useWallet";
 
 const ProfileHeader: React.FC = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const { name } = useWallet();
+    const { name, clearToken } = useWallet();
     const navigate = useNavigate();
     const menuRef = useRef<HTMLDivElement>(null); // Ref for the menu
 
@@ -18,6 +18,11 @@ const ProfileHeader: React.FC = () => {
         if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
             setIsMenuOpen(false);
         }
+    };
+
+    const handleLockScreen = () => {
+        clearToken();
+        navigate('/locked');
     };
 
     useEffect(() => {
@@ -74,7 +79,7 @@ const ProfileHeader: React.FC = () => {
                         <div className="border border-white/20 my-2" />
                         <p
                             className="text-white text-lg font-normal cursor-pointer"
-                            onClick={() => navigate('/locked')}
+                            onClick={handleLockScreen}
                         >
                             Lock Screen
                         </p>

@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import Button from "../components/Button";
 import { useNavigate } from "react-router-dom";
 import useWallet from "../hooks/useWallet";
-import { ethers } from "ethers";
 
 function LockScreen() {
     const { password, setToken } = useWallet();
@@ -15,8 +14,10 @@ function LockScreen() {
     };
 
     const handleSubmit = () => {
+        console.log("***** password", password);
+        console.log("***** enteredPassword", enteredPassword);
         if (enteredPassword === password) {
-            const token = ethers.sha256(password + Date.now().toString()).slice(2);
+            const token = password + Date.now().toString();
             setToken(token);
             navigate("/home");
         } else {
