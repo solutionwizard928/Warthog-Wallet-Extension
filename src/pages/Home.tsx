@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import ProfileHeader from '../components/ProfileHeader';
 import WalletInfo from '../components/WalletInfo';
 import Balance from '../components/Balance';
@@ -50,6 +50,10 @@ const Home: React.FC<Props> = ({ setSelectedActivity }) => {
         setSelectedActivity(activityItem);
         navigate('/activity-details');
     };
+
+    useEffect(() => {
+        console.log("**** here is Home page");
+    }, []);
 
     return (
         <div className="container min-h-screen">

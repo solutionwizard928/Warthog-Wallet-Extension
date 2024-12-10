@@ -28,8 +28,6 @@ interface Activity {
 
 const App: React.FC = () => {
   const { seedPhrase, wallet, password, token, clearToken } = useWallet();
-
-  console.log(seedPhrase, wallet, password, token);
   const [progress, setProgress] = useState(0);
   const [loading, setLoading] = useState(true);
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);

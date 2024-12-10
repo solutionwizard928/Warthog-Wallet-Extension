@@ -3,6 +3,7 @@ import * as bip39 from "bip39";
 import * as elliptic from "elliptic";
 import { ethers } from "ethers";
 import { getKeyFromPassword, encrypt, decrypt } from "dha-encryption";
+import browser from "webextension-polyfill";
 
 declare const chrome: {
     storage: {
@@ -70,28 +71,43 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         return bytes.buffer;
     }
 
-    const saveToChromeStorage = async (key: string, value: string | null): Promise<void> => {
+    const saveToBrowserStorage = async (key: string, value: string | null): Promise<void> => {
         try {
             const keyObject = await getKeyFromPassword(ENCRYPTION_KEY);
             const encryptedValue = value ? await encrypt(value, keyObject) : null;
             const hexValue = encryptedValue ? arrayBufferToHex(encryptedValue) : null;
-            chrome.storage.local.set({ [key]: hexValue });
+
+            browser.storage.local.set({ [key]: hexValue }).then(() => {
+                console.log(`${key} saved to browser storage`);
+            }).catch((error: unknown) => {
+                console.error(`Error saving ${key} to browser storage:`, error);
+            });
         } catch (error) {
-            console.error(`Error saving ${key} to Chrome storage:`, error);
+            console.error(`Error saving ${key} to browser storage:`, error);
         }
+    };
+
+    const decryptValue = async (value: string | undefined): Promise<string | null> => {
+        const keyObject = await getKeyFromPassword(ENCRYPTION_KEY);
+        const arrayBuffer = value ? hexToArrayBuffer(value) : null;
+        const decryptedValue = arrayBuffer ? await decrypt(arrayBuffer, keyObject) : null;
+        return decryptedValue;
     };
 
     const loadFromChromeStorage = useCallback((key: string, callback: (value: string | null) => void): void => {
         try {
-            chrome.storage.local.get(key, async (result) => {
-                const keyObject = await getKeyFromPassword(ENCRYPTION_KEY);
-                const encryptedValue = result[key] as string | undefined;
-                const arrayBuffer = encryptedValue ? hexToArrayBuffer(encryptedValue) : null;
-                const decryptedValue = arrayBuffer ? await decrypt(arrayBuffer, keyObject) : null;
-                callback(decryptedValue);
+            browser.storage.local.get(key).then( (result: Record<string, unknown>) => {
+                console.log("***** result", result);
+                decryptValue(result[key] as string | undefined).then((decryptedValue) => {
+                    callback(decryptedValue);
+                }).catch((error: unknown) => {
+                    console.error(`Error decrypting ${key} from browser storage:`, error);
+                });
+            }).catch((error: unknown) => {
+                console.error(`Error loading ${key} from browser storage:`, error);
             });
         } catch (error) {
-            console.error(`Error loading ${key} from Chrome storage:`, error);
+            console.error(`Error loading ${key} from browser storage:`, error);
         }
     }, []);
 
@@ -132,8 +148,8 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     const setToken = (token: string): void => {
         setTokenState(token);
         const expirationTime = Date.now() + 3600 * 1000; // 1 hour
-        saveToChromeStorage("token", token);
-        saveToChromeStorage("tokenExpiration", expirationTime.toString());
+        saveToBrowserStorage("token", token);
+        saveToBrowserStorage("tokenExpiration", expirationTime.toString());
     };
 
     const clearToken = (): void => {
@@ -145,40 +161,37 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
     const setSeedPhrase = (seedPhrase: string): void => {
         setSeedPhraseState(seedPhrase);
-        saveToChromeStorage("seedPhrase", seedPhrase);
+        saveToBrowserStorage("seedPhrase", seedPhrase);
     };
 
     const setWallet = (wallet: string): void => {
         setWalletState(wallet);
-        saveToChromeStorage("wallet", wallet);
+        saveToBrowserStorage("wallet", wallet);
     };
 
     const setWalletList = (walletList: string[]): void => {
         setWalletListState(walletList);
-        saveToChromeStorage("walletList", walletList.join(","));
+        saveToBrowserStorage("walletList", walletList.join(","));
     };
 
     const setNameList = (nameList: string[]): void => {
         setNameListState(nameList);
-        saveToChromeStorage("nameList", nameList.join(","));
+        saveToBrowserStorage("nameList", nameList.join(","));
     };
 
     const setSelectedWalletIndex = (selectedWalletIndex: number): void => {
         setSelectedWalletIndexState(selectedWalletIndex);
-        saveToChromeStorage("selectedWalletIndex", selectedWalletIndex.toString());
+        saveToBrowserStorage("selectedWalletIndex", selectedWalletIndex.toString());
     };
 
     const setPassword = (password: string): void => {
         setPasswordState(password);
-        saveToChromeStorage("password", password);
-
-        const token = CryptoJS.SHA256(password + Date.now().toString()).toString();
-        setToken(token);
+        saveToBrowserStorage("password", password);
     };
 
     const setName = (name: string): void => {
         setNameState(name);
-        saveToChromeStorage("name", name);
+        saveToBrowserStorage("name", name);
     };
 
     const clearWalletData = (): void => {
