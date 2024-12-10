@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Button from "../components/Button";
 import { useNavigate } from "react-router-dom";
 import useWallet from "../hooks/useWallet";
-import CryptoJS from "crypto-js";
+import { ethers } from "ethers";
 
 function LockScreen() {
     const { password, setToken } = useWallet();
@@ -16,7 +16,7 @@ function LockScreen() {
 
     const handleSubmit = () => {
         if (enteredPassword === password) {
-            const token = CryptoJS.SHA256(password + Date.now().toString()).toString();
+            const token = ethers.sha256(password + Date.now().toString()).slice(2);
             setToken(token);
             navigate("/home");
         } else {

@@ -28,6 +28,8 @@ interface Activity {
 
 const App: React.FC = () => {
   const { seedPhrase, wallet, password, token, clearToken } = useWallet();
+
+  console.log(seedPhrase, wallet, password, token);
   const [progress, setProgress] = useState(0);
   const [loading, setLoading] = useState(true);
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
@@ -86,7 +88,7 @@ const App: React.FC = () => {
       <Route path="/" element={<Start />} />
       <Route path="/intro" element={<Intro />} />
       <Route path="/import" element={<ImportPage />} />
-      <Route path="/recover" element={<RecoveryPhase mnemonic={seedPhrase} />} />
+      <Route path="/recover" element={<RecoveryPhase />} />
       <Route path="/validate" element={<Validate />} />
       <Route path="/validate-intro" element={<ValidateIntro recoveryPhrase={seedPhrase?.split(' ') || []} onGoBack={() => navigate(-2)} onComplete={() => navigate('/set-password')} />} />
       <Route path="/set-password" element={<SetPassword />} />

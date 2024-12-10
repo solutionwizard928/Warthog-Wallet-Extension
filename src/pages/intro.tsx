@@ -5,23 +5,12 @@ import { useNavigate } from 'react-router-dom';
 import useWallet from '../hooks/useWallet';
 
 const Info: React.FC = () => {
-    const { setSeedPhrase, setWallet, newWallet } = useWallet();
+    const { newWallet } = useWallet();
     const navigate = useNavigate();
-
-    // const generateWallet = useCallback(async () => {
-    //     const wallet = ethers.Wallet.createRandom();
-    //     const mnemonic = wallet.mnemonic?.phrase || '';
-    //     setSeedPhrase(mnemonic);
-    //     const newWallet = ethers.Wallet.fromPhrase(mnemonic).address;
-    //     setWallet(newWallet);
-    //     navigate('/recover');
-    // }, [navigate, setSeedPhrase, setWallet]);
 
     const generateWallet = () => {
         newWallet();
         navigate('/recover');
-        setSeedPhrase('');
-        setWallet('');
     };
 
     return (
