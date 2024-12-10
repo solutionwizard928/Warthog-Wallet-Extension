@@ -1,7 +1,8 @@
-import React, { createContext, useState, useEffect, ReactNode } from "react";
+import React, { createContext, useState, useEffect, ReactNode, useCallback } from "react";
 import * as bip39 from "bip39";
 import * as elliptic from "elliptic";
 import { ethers } from "ethers";
+import { getKeyFromPassword, encrypt, decrypt } from "dha-encryption";
 
 declare const chrome: {
     storage: {
@@ -32,6 +33,9 @@ interface WalletContextProps {
     setSeedPhrase: (seedPhrase: string) => void;
     setWallet: (wallet: string) => void;
     setPassword: (password: string) => void;
+    setWalletList: (walletList: string[]) => void;
+    setNameList: (nameList: string[]) => void;
+    setSelectedWalletIndex: (selectedWalletIndex: number) => void;
     clearWalletData: () => void;
     token: string | null;
     setToken: (token: string) => void;
@@ -44,21 +48,7 @@ interface WalletContextProps {
 
 const WalletContext = createContext<WalletContextProps | undefined>(undefined);
 
-const ENCRYPTION_KEY = import.meta.env.VITE_APP_ENCRYPTION_KEY || "";
-
-const encryptData = (data: string): string => {
-    return CryptoJS.AES.encrypt(data, ENCRYPTION_KEY).toString();
-};
-
-const decryptData = (ciphertext: string): string | null => {
-    try {
-        const bytes = CryptoJS.AES.decrypt(ciphertext, ENCRYPTION_KEY);
-        return bytes.toString(CryptoJS.enc.Utf8);
-    } catch (error) {
-        console.error("Error decrypting data:", error);
-        return null;
-    }
-};
+const ENCRYPTION_KEY = import.meta.env.VITE_APP_ENCRYPTION_KEY || "encryption_key";
 
 export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [seedPhrase, setSeedPhraseState] = useState<string | null>(null);
@@ -70,53 +60,67 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     const [nameList, setNameListState] = useState<string[]>([]);
     const [token, setTokenState] = useState<string | null>(null);
 
-    const saveToChromeStorage = (key: string, value: string | null): void => {
+    const arrayBufferToHex = (buffer: ArrayBuffer): string => {
+        const bytes = new Uint8Array(buffer);
+        return Array.from(bytes).map(byte => byte.toString(16).padStart(2, '0')).join('');
+    }
+
+    const hexToArrayBuffer = (hex: string): ArrayBuffer => {
+        const bytes = new Uint8Array(hex.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
+        return bytes.buffer;
+    }
+
+    const saveToChromeStorage = async (key: string, value: string | null): Promise<void> => {
         try {
-            const encryptedValue = value ? encryptData(value) : null;
-            chrome.storage.local.set({ [key]: encryptedValue });
+            const keyObject = await getKeyFromPassword(ENCRYPTION_KEY);
+            const encryptedValue = value ? await encrypt(value, keyObject) : null;
+            const hexValue = encryptedValue ? arrayBufferToHex(encryptedValue) : null;
+            chrome.storage.local.set({ [key]: hexValue });
         } catch (error) {
             console.error(`Error saving ${key} to Chrome storage:`, error);
         }
     };
 
-    const loadFromChromeStorage = (key: string, callback: (value: string | null) => void): void => {
+    const loadFromChromeStorage = useCallback((key: string, callback: (value: string | null) => void): void => {
         try {
-            chrome.storage.local.get(key, (result) => {
+            chrome.storage.local.get(key, async (result) => {
+                const keyObject = await getKeyFromPassword(ENCRYPTION_KEY);
                 const encryptedValue = result[key] as string | undefined;
-                const decryptedValue = encryptedValue ? decryptData(encryptedValue) : null;
+                const arrayBuffer = encryptedValue ? hexToArrayBuffer(encryptedValue) : null;
+                const decryptedValue = arrayBuffer ? await decrypt(arrayBuffer, keyObject) : null;
                 callback(decryptedValue);
             });
         } catch (error) {
             console.error(`Error loading ${key} from Chrome storage:`, error);
         }
-    };
+    }, []);
 
     const newWallet = async (): Promise<void> => {
         try {
             console.log("-------------- newWallet --------------");
             // mnemonic 12 words
             const mnemonic = bip39.generateMnemonic();
-            console.log("***** mnemonic", mnemonic);
 
+            // generate key pair
             const ec = new elliptic.ec("secp256k1");
-            const key = ec.genKeyPair({ entropy: bip39.mnemonicToSeedSync(mnemonic) });
+            const key = ec.genKeyPair({ entropy: bip39.mnemonicToSeedSync(mnemonic, "account0") });
 
-            const privateKey = key.getPrivate().toString("hex");
+            // generate address
             const publicKey = key.getPublic().encode("hex", true);
-            console.log("***** privateKey", privateKey);
-            console.log("***** publicKey", publicKey);
-
             const sha256 = ethers.sha256("0x" + publicKey).slice(2);
-            console.log("***** sha256", sha256);
-
             const ripemd160 = ethers.ripemd160("0x" + sha256).slice(2);
-            console.log("***** ripemd160", ripemd160);
-            
             const checksum = ethers.sha256("0x" + ripemd160).slice(2, 10);
-            console.log("***** checksum", checksum);
-
             const address = ripemd160 + checksum;
             console.log("***** address", address);
+
+            // save to storage
+            setSeedPhrase(mnemonic);
+            setWallet(address);
+            setWalletList([...walletList, address]);
+            setNameList([...nameList, "Account 0"]);
+            setSelectedWalletIndex(walletList.length);
+            setName("Account 0");
+            console.log("***** walletList length", walletList.length);
 
             console.log("-------------- End of newWallet --------------");
 
@@ -149,6 +153,21 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         saveToChromeStorage("wallet", wallet);
     };
 
+    const setWalletList = (walletList: string[]): void => {
+        setWalletListState(walletList);
+        saveToChromeStorage("walletList", walletList.join(","));
+    };
+
+    const setNameList = (nameList: string[]): void => {
+        setNameListState(nameList);
+        saveToChromeStorage("nameList", nameList.join(","));
+    };
+
+    const setSelectedWalletIndex = (selectedWalletIndex: number): void => {
+        setSelectedWalletIndexState(selectedWalletIndex);
+        saveToChromeStorage("selectedWalletIndex", selectedWalletIndex.toString());
+    };
+
     const setPassword = (password: string): void => {
         setPasswordState(password);
         saveToChromeStorage("password", password);
@@ -175,10 +194,13 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     useEffect(() => {
         loadFromChromeStorage("seedPhrase", setSeedPhraseState);
         loadFromChromeStorage("wallet", setWalletState);
+        loadFromChromeStorage("walletList", (walletList) => setWalletListState(walletList ? walletList.split(",") : []));
+        loadFromChromeStorage("nameList", (nameList) => setNameListState(nameList ? nameList.split(",") : []));
+        loadFromChromeStorage("selectedWalletIndex", (selectedWalletIndex) => setSelectedWalletIndexState(selectedWalletIndex ? parseInt(selectedWalletIndex, 10) : 0));
         loadFromChromeStorage("password", setPasswordState);
         loadFromChromeStorage("name", setNameState);
         loadFromChromeStorage("token", setTokenState);
-    }, []);
+    }, [loadFromChromeStorage]);
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -190,7 +212,7 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
             });
         }, 1000 * 60);
         return () => clearInterval(interval);
-    }, []);
+    }, [loadFromChromeStorage]);
 
     return (
         <WalletContext.Provider
@@ -204,6 +226,9 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
                 setWallet,
                 setPassword,
                 setName,
+                setWalletList,
+                setNameList,
+                setSelectedWalletIndex,
                 clearWalletData,
                 setToken,
                 clearToken,

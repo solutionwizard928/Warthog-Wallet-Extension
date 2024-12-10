@@ -1,18 +1,16 @@
-import React from 'react';
+import { useEffect } from 'react';
 import Button from '../components/Button';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
+import useWallet from '../hooks/useWallet';
 
-interface RecoveryPhaseProps {
-    mnemonic: string | null;
-}
-
-const RecoveryPhase: React.FC<RecoveryPhaseProps> = ({ mnemonic }) => {
+const RecoveryPhase = () => {
     const navigate = useNavigate();
+    const { seedPhrase } = useWallet();
 
     const handleBackup = () => {
-        if (!mnemonic) return;
-        const blob = new Blob([mnemonic], { type: 'text/plain' });
+        if (!seedPhrase) return;
+        const blob = new Blob([seedPhrase], { type: 'text/plain' });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -20,6 +18,10 @@ const RecoveryPhase: React.FC<RecoveryPhaseProps> = ({ mnemonic }) => {
         a.click();
         window.URL.revokeObjectURL(url);
     };
+
+    useEffect(() => {
+        console.log(seedPhrase);
+    }, [seedPhrase]);
 
     return (
         <div className="min-h-screen container relative">
@@ -32,7 +34,7 @@ const RecoveryPhase: React.FC<RecoveryPhaseProps> = ({ mnemonic }) => {
 
             <div className="mt-5">
                 <div className="grid grid-cols-2 gap-4">
-                    {mnemonic?.split(' ').map((word, index) => (
+                    {seedPhrase?.split(' ').map((word, index) => (
                         <div key={index} className="bg-primary/20 rounded-full px-1 justify-start items-center inline-flex">
                             <div className="justify-center items-center flex w-8">
                                 <div className="text-center text-white text-lg font-normal select-none">{index + 1}</div>
