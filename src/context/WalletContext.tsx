@@ -1,8 +1,7 @@
 import React, { createContext, useState, useEffect, ReactNode } from "react";
 import * as bip39 from "bip39";
 import * as elliptic from "elliptic";
-import CryptoJS from "crypto-js";
-import Ripemd160 from "ripemd160";
+import { ethers } from "ethers";
 
 declare const chrome: {
     storage: {
@@ -107,24 +106,18 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
             console.log("***** privateKey", privateKey);
             console.log("***** publicKey", publicKey);
 
-            const sha = await window.crypto.subtle.digest('SHA-256', Buffer.from(publicKey, "hex"));
-            const shaHex = Array.from(new Uint8Array(sha)).map(b => b.toString(16).padStart(2, '0')).join('');
-            console.log("***** sha", shaHex);
-            // const tmp = new Ripemd160();
-            // const ripemd160 = tmp.update('42').digest("hex");
-            // console.log("***** ripemd160", ripemd160);
-            // const ripemd160Hex = Array.from(new Uint8Array(ripemd160)).map(b => b.toString(16).padStart(2, '0')).join('');
-            // console.log("***** ripemd160", ripemd160Hex);
-            // const checksum = await window.crypto.subtle.digest('SHA-256', ripemd160);
-            // const checksumHex = Array.from(new Uint8Array(checksum)).map(b => b.toString(16).padStart(2, '0')).join('');
-            // console.log("***** checksum", checksumHex);
-            // const address = ripemd160Hex + checksumHex.slice(0, 8);
-            // // const address = Buffer.concat([ripemd160, checksum.slice(0, 4)]);
+            const sha256 = ethers.sha256("0x" + publicKey).slice(2);
+            console.log("***** sha256", sha256);
 
-            // console.log("***** address", address);
+            const ripemd160 = ethers.ripemd160("0x" + sha256).slice(2);
+            console.log("***** ripemd160", ripemd160);
+            
+            const checksum = ethers.sha256("0x" + ripemd160).slice(2, 10);
+            console.log("***** checksum", checksum);
 
-            // save to chrome storage
-            // setSeedPhrase(mnemonic);
+            const address = ripemd160 + checksum;
+            console.log("***** address", address);
+
             console.log("-------------- End of newWallet --------------");
 
         } catch (error) {
