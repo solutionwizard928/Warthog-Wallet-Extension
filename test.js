@@ -13,7 +13,7 @@ import CryptoJS from 'crypto-js';
 var pk = ec.genKeyPair()
 
 // alternatively read private key
-var pkhex= '902e0a24d370599d447c0bad2b147e59ff9a790a7df838b6b1cfc98dbf3a5946'
+var pkhex= '8b3ec81d4f0b865c61373aea6c0add61ffb6c7b52fe27ab01b98667fa4b9f8e'
 var pk =  ec.keyFromPrivate(pkhex);
 
 // convert private key to hex
