@@ -46,7 +46,7 @@ const ProfileHeader: React.FC = () => {
                     className="w-[70px] h-[70px] rounded-full object-cover"
                 />
                 <div className="grid gap-1">
-                    <h1 className="text-white text-xl font-semibold">Hey, {name}</h1>
+                    <h1 className="text-white text-xl font-semibold">{name}</h1>
                     <p className="text-white/30 text-xs font-normal">Connected Wallet</p>
                 </div>
             </div>

@@ -16,7 +16,7 @@ const TokenItem: React.FC<TokenItemProps> = ({ token, balance, usdValue }) => (
             </div>
         </div>
         <div>
-            <h5 className="text-right text-white text-xl font-medium">{balance}</h5>
+            <h5 className="text-right text-white text-xl font-medium">USD</h5>
             <p className="text-right text-white/50 text-lg font-normal">${usdValue}</p>
         </div>
     </div>

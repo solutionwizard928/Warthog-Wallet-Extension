@@ -1,14 +1,11 @@
 import React from 'react';
+import { formatWalletAddress } from '../utils';
 
 interface WalletInfoProps {
     wallet: string | null;
     onCopy: () => void;
     isCopied: boolean;
 }
-
-const formatWalletAddress = (address: string, startLength: number = 10, endLength: number = 10): string => {
-    return `${address.slice(0, startLength)}....${address.slice(-endLength)}`;
-};
 
 const WalletInfo: React.FC<WalletInfoProps> = ({ wallet, onCopy, isCopied }) => (
     <div className="flex-col gap-2.5 py-4 px-2 rounded-[10px] border border-[#e0e0e0] w-full">
@@ -23,7 +20,7 @@ const WalletInfo: React.FC<WalletInfoProps> = ({ wallet, onCopy, isCopied }) => 
                     {isCopied ? "Copied" : "Copy address"}
                 </span>
             </button>
-            <a href={`https://etherscan.io/address/${wallet}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+            <a href={`https://wartscan.io/account/${wallet}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
                 <img src="Document.svg" alt="Document" className="w-5 h-5" />
                 <span className="text-white text-sm">View on explorer</span>
             </a>

@@ -1,37 +1,61 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "../components/Button";
 import Header from "../components/Header";
 import AccountCard from "../components/AccountCard";
 import useWallet from "../hooks/useWallet";
 
-function ManageAccounts() {
-    const { setName } = useWallet();
+interface AccountType {
+    id: number,
+    name: string,
+    address: string,
+    balance: number,
+    balanceUSD: number,
+    visible: boolean
+}
 
-    const [accounts, setAccounts] = useState([
-        { name: "Jazie Doe", address: "0x05c4...1sa5cfas", balance: "0.00", balanceUSD: "$0.00" },
-        { name: "John Smith", address: "0x1234...abcd", balance: "1.23", balanceUSD: "$123.45" },
-        { name: "Alice Brown", address: "0xabcd...1234", balance: "5.67", balanceUSD: "$567.89" },
-    ]);
+function ManageAccounts() {
+    const { name, nameList, walletList, visibleWalletList, setName, setWallet, setVisibleWalletList, setSelectedWalletIndex } = useWallet();
+
+    const [accounts, setAccounts] = useState<AccountType[]>([] as AccountType[]);
 
     const [searchQuery, setSearchQuery] = useState("");
 
     const filteredAccounts = accounts.filter(
         (account) =>
-            account.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            account.address.toLowerCase().includes(searchQuery.toLowerCase())
+            account.visible &&
+            (
+                account.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                account.address.toLowerCase().includes(searchQuery.toLowerCase())
+            )
     );
 
-    function setPrimaryAccount(name: string) {
+    const setPrimaryAccount = (id: number) => {
         console.log("Primary Account Set");
-        setName(name);
+        setName(nameList[id]);
+        setWallet(walletList[id]);
+        setSelectedWalletIndex(id);
     }
 
-    function removeAccount(name: string) {
-        setAccounts((prevAccounts) =>
-            prevAccounts.filter((account) => account.name !== name)
-        );
+    const removeAccount = (id: number) => {
+        setVisibleWalletList(visibleWalletList.map((visible, index) => index !== id ? visible : false));
         console.log(`${name} removed from accounts`);
     }
+
+    useEffect(() => {
+        if (nameList.length !== walletList.length) {
+            console.log(`**** unmatched error in nameList and walletList:`, nameList.length, walletList.length);
+        }
+        else {
+            setAccounts(nameList.map((name, index) => ({
+                id: index,
+                name,
+                address: walletList[index],
+                balance: 0,
+                balanceUSD: 0,
+                visible: visibleWalletList[index]
+            })))
+        }
+    }, [walletList, nameList, visibleWalletList])
 
     return (
         <div className="min-h-screen container relative px-4">
