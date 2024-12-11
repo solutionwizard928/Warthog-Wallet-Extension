@@ -58,7 +58,7 @@ const ValidateIntro: React.FC<ValidateIntroProps> = ({ recoveryPhrase, onGoBack,
             localStorage.setItem('inputWordsBackup', JSON.stringify(inputWords));
             setTimeout(() => {
                 onComplete();
-            }, 3000);
+            }, 1000);
         }
     };
 

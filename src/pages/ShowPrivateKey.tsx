@@ -49,7 +49,7 @@ function ShowPrivateKey() {
                     alt="Profile"
                 />
                 <div>
-                    <div className="text-xl font-semibold text-white">Hey, {name}</div>
+                    <div className="text-xl font-semibold text-white">{name}</div>
                     <div className="text-xs text-white/50">Connected Wallet</div>
                 </div>
             </div>

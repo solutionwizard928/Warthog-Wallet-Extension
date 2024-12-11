@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import axios from 'axios';
 import ProfileHeader from '../components/ProfileHeader';
 import WalletInfo from '../components/WalletInfo';
 import Balance from '../components/Balance';
@@ -26,12 +27,12 @@ enum Tab {
 }
 
 const activities: Activity[] = [
-    {
-        date: "Nov 13, 2024",
-        action: "Send USDT",
-        amount: "-10 USDT",
-        usdAmount: "-$10.01 USD",
-    },
+    // {
+    //     date: "Nov 13, 2024",
+    //     action: "Send USDT",
+    //     amount: "-10 USDT",
+    //     usdAmount: "-$10.01 USD",
+    // },
 ];
 
 const Home: React.FC<Props> = ({ setSelectedActivity }) => {
@@ -39,6 +40,8 @@ const Home: React.FC<Props> = ({ setSelectedActivity }) => {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<Tab>(Tab.Tokens);
     const [isCopied, setIsCopied] = useState(false);
+    const [balance, setBalance] = useState(0);
+    const [balanceUSD, setBalanceUSD] = useState(0);
 
     const copyToClipboard = useCallback((text: string) => {
         navigator.clipboard.writeText(text);
@@ -51,21 +54,40 @@ const Home: React.FC<Props> = ({ setSelectedActivity }) => {
         navigate('/activity-details');
     };
 
+    const updateBalance = () => {
+        if (wallet) {
+            axios.get(`${import.meta.env.VITE_APP_API_URL}/account/${wallet}/balance`)
+                .then((response) => {
+                    setBalance(response?.data?.balance ? parseFloat(response?.data?.balance) : 0);
+                    setBalanceUSD(response?.data?.balanceUSD ? parseFloat(response?.data?.balanceUSD) : 0);
+                })
+                .catch((error) => {
+                    console.error("Error fetching balance:", error);
+                });
+        }
+    }
+
     useEffect(() => {
         console.log("**** here is Home page");
+        if (wallet) {
+            updateBalance();
+
+            const intervalId = setInterval(updateBalance, 3000);
+            return () => clearInterval(intervalId);
+        }
     }, []);
 
     return (
         <div className="container min-h-screen">
-            <div className="p-2.5 bg-white/10 w-full rounded-48 backdrop-blur-[9px] flex-col justify-center items-center gap-8 inline-flex">
+            <div className="p-2.5 bg-white/10 w-full rounded-48 backdrop-blur-[9px] flex-col justify-center items-center gap-4 inline-flex">
                 <ProfileHeader />
                 <WalletInfo wallet={wallet} onCopy={() => copyToClipboard(wallet || "")} isCopied={isCopied} />
-                <Balance balance="17200 Wart" usdValue="5100 $" />
+                <Balance balance={balance ? balance.toString() : "0"} usdValue={balanceUSD ? balanceUSD.toString() : "0"} />
                 <ActionButtons />
             </div>
             <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
             {activeTab === Tab.Tokens ? (
-                <TokenItem token="Wart" balance="17200" usdValue="5100" />
+                <TokenItem token="WART" balance={balance ? balance.toString() : "0"} usdValue={balanceUSD ? balanceUSD.toString() : "0" } />
             ) : (
                 <ActivityItem activities={activities} onActivityClick={handleActivityClick} />
             )}

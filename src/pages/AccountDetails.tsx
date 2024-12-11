@@ -71,7 +71,7 @@ function AccountDetails() {
                 />
                 <div>
                     <div className="text-xl font-semibold text-white">
-                        Hey, {isEditing ? (
+                        {isEditing ? (
                             <input
                                 type="text"
                                 value={tempName || ""}

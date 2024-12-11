@@ -5,28 +5,12 @@ import { ethers } from "ethers";
 import { getKeyFromPassword, encrypt, decrypt } from "dha-encryption";
 import browser from "webextension-polyfill";
 
-declare const chrome: {
-    storage: {
-        local: {
-            remove(arg0: string[], arg1: () => void): unknown;
-            set: (
-                items: Record<string, unknown>,
-                callback?: () => void
-            ) => void;
-            get: (
-                keys: string | string[],
-                callback: (items: Record<string, unknown>) => void
-            ) => void;
-            clear: (keys: string | string[], callback?: () => void) => void;
-        };
-    };
-};
-
 interface WalletContextProps {
     seedPhrase: string | null;
     wallet: string | null;
     walletList: string[];
     nameList: string[];
+    visibleWalletList: boolean[];
     selectedWalletIndex: number;
     password: string | null;
     name: string | null;
@@ -36,6 +20,7 @@ interface WalletContextProps {
     setPassword: (password: string) => void;
     setWalletList: (walletList: string[]) => void;
     setNameList: (nameList: string[]) => void;
+    setVisibleWalletList: (visibleWalletList: boolean[]) => void;
     setSelectedWalletIndex: (selectedWalletIndex: number) => void;
     clearWalletData: () => void;
     token: string | null;
@@ -45,6 +30,7 @@ interface WalletContextProps {
     setWalletListState: (walletList: string[]) => void;
     setNameListState: (nameList: string[]) => void;
     setSelectedWalletIndexState: (selectedWalletIndex: number) => void;
+    setVisibleWalletListState: (visibleWalletList: boolean[]) => void;
 }
 
 const WalletContext = createContext<WalletContextProps | undefined>(undefined);
@@ -60,6 +46,7 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     const [selectedWalletIndex, setSelectedWalletIndexState] = useState<number>(0);
     const [nameList, setNameListState] = useState<string[]>([]);
     const [token, setTokenState] = useState<string | null>(null);
+    const [visibleWalletList, setVisibleWalletListState] = useState<boolean[]>([]);
 
     const arrayBufferToHex = (buffer: ArrayBuffer): string => {
         const bytes = new Uint8Array(buffer);
@@ -134,6 +121,7 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
             setWallet(address);
             setWalletList([...walletList, address]);
             setNameList([...nameList, "Account 0"]);
+            setVisibleWalletList([...visibleWalletList, true]);
             setSelectedWalletIndex(walletList.length);
             setName("Account 0");
             console.log("***** walletList length", walletList.length);
@@ -154,8 +142,10 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
     const clearToken = (): void => {
         setTokenState(null);
-        chrome.storage.local.remove(["token", "tokenExpiration"], () => {
+        browser.storage.local.remove(["token", "tokenExpiration"]).then(() => {
             console.log("Token and token expiration removed");
+        }).catch((error: unknown) => {
+            console.error("Error removing token and token expiration:", error);
         });
     };
 
@@ -194,13 +184,20 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         saveToBrowserStorage("name", name);
     };
 
+    const setVisibleWalletList = (visibleWalletList: boolean[]): void => {
+        setVisibleWalletListState(visibleWalletList);
+        saveToBrowserStorage("visibleWalletList", visibleWalletList.join(","));
+    };
+
     const clearWalletData = (): void => {
         setSeedPhraseState(null);
         setWalletState(null);
         setPasswordState(null);
         setNameState(null);
-        chrome.storage.local.remove(["seedPhrase", "wallet", "password", "name"], () => {
+        browser.storage.local.remove(["seedPhrase", "wallet", "password", "name"]).then(() => {
             console.log("Seed phrase, wallet, password, and name removed");
+        }).catch((error: unknown) => {
+            console.error("Error removing seed phrase, wallet, password, and name:", error);
         });
     };
 
@@ -209,6 +206,10 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         loadFromChromeStorage("wallet", setWalletState);
         loadFromChromeStorage("walletList", (walletList) => setWalletListState(walletList ? walletList.split(",") : []));
         loadFromChromeStorage("nameList", (nameList) => setNameListState(nameList ? nameList.split(",") : []));
+        loadFromChromeStorage("visibleWalletList", (visibleWalletList) => {
+            const boolArray = visibleWalletList ? visibleWalletList.split(",").map(val => val === "true") : [];
+            setVisibleWalletListState(boolArray);
+        });
         loadFromChromeStorage("selectedWalletIndex", (selectedWalletIndex) => setSelectedWalletIndexState(selectedWalletIndex ? parseInt(selectedWalletIndex, 10) : 0));
         loadFromChromeStorage("password", setPasswordState);
         loadFromChromeStorage("name", setNameState);
@@ -235,23 +236,26 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
                 password,
                 name,
                 token,
+                walletList,
+                nameList,
+                visibleWalletList,
                 setSeedPhrase,
                 setWallet,
                 setPassword,
                 setName,
                 setWalletList,
                 setNameList,
+                setVisibleWalletList,
                 setSelectedWalletIndex,
                 clearWalletData,
                 setToken,
                 clearToken,
                 newWallet,
-                walletList,
-                nameList,
                 selectedWalletIndex,
                 setWalletListState,
                 setNameListState,
-                setSelectedWalletIndexState
+                setSelectedWalletIndexState,
+                setVisibleWalletListState,
             }}
         >
             {children}
