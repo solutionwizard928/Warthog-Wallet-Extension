@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Button from '../components/Button';
 import Header from '../components/Header';
+import useWallet from '../hooks/useWallet';
 
 interface ValidateIntroProps {
     recoveryPhrase: string[];
@@ -9,15 +10,15 @@ interface ValidateIntroProps {
 }
 
 const ValidateIntro: React.FC<ValidateIntroProps> = ({ recoveryPhrase, onGoBack, onComplete }) => {
+    const { inputWordsBackup, setInputWordsBackup } = useWallet();
     const [inputWords, setInputWords] = useState<string[]>(Array(recoveryPhrase.length).fill(''));
     const [errors, setErrors] = useState<boolean[]>(Array(recoveryPhrase.length).fill(false));
     const [isCompleted, setIsCompleted] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
 
     useEffect(() => {
-        const savedInputWords = localStorage.getItem('inputWordsBackup');
-        if (savedInputWords) {
-            setInputWords(JSON.parse(savedInputWords));
+        if (inputWordsBackup.length > 0) {
+            setInputWords(inputWordsBackup);
         }
     }, []);
 
@@ -55,7 +56,7 @@ const ValidateIntro: React.FC<ValidateIntroProps> = ({ recoveryPhrase, onGoBack,
 
         if (newErrors.every((error) => !error)) {
             setIsProcessing(true);
-            localStorage.setItem('inputWordsBackup', JSON.stringify(inputWords));
+            setInputWordsBackup(inputWords);
             setTimeout(() => {
                 onComplete();
             }, 1000);

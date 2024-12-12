@@ -14,6 +14,8 @@ interface WalletContextProps {
     selectedWalletIndex: number;
     password: string | null;
     name: string | null;
+    tmpDestinationWallet: string | null;
+    inputWordsBackup: string[];
     setName: (name: string) => void;
     setSeedPhrase: (seedPhrase: string) => void;
     setWallet: (wallet: string) => void;
@@ -22,15 +24,19 @@ interface WalletContextProps {
     setNameList: (nameList: string[]) => void;
     setVisibleWalletList: (visibleWalletList: boolean[]) => void;
     setSelectedWalletIndex: (selectedWalletIndex: number) => void;
+    setInputWordsBackup: (inputWordsBackup: string[]) => void;
     clearWalletData: () => void;
     token: string | null;
     setToken: (token: string) => void;
     clearToken: () => void;
     newWallet: () => void;
+    importWallet: (seedPhrase: string) => void;
     setWalletListState: (walletList: string[]) => void;
     setNameListState: (nameList: string[]) => void;
     setSelectedWalletIndexState: (selectedWalletIndex: number) => void;
     setVisibleWalletListState: (visibleWalletList: boolean[]) => void;
+    setTmpDestinationWalletState: (tmpDestinationWallet: string) => void;
+    getPrivateKeyFromIndex: (index: number) => string;
 }
 
 const WalletContext = createContext<WalletContextProps | undefined>(undefined);
@@ -47,6 +53,8 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     const [nameList, setNameListState] = useState<string[]>([]);
     const [token, setTokenState] = useState<string | null>(null);
     const [visibleWalletList, setVisibleWalletListState] = useState<boolean[]>([]);
+    const [tmpDestinationWallet, setTmpDestinationWalletState] = useState<string | null>(null);
+    const [inputWordsBackup, setInputWordsBackupState] = useState<string[]>([]);
 
     const arrayBufferToHex = (buffer: ArrayBuffer): string => {
         const bytes = new Uint8Array(buffer);
@@ -81,9 +89,14 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         return decryptedValue;
     };
 
+    const setInputWordsBackup = (inputWordsBackup: string[]): void => {
+        setInputWordsBackupState(inputWordsBackup);
+        saveToBrowserStorage("inputWordsBackup", inputWordsBackup.join(","));
+    };
+
     const loadFromChromeStorage = useCallback((key: string, callback: (value: string | null) => void): void => {
         try {
-            browser.storage.local.get(key).then( (result: Record<string, unknown>) => {
+            browser.storage.local.get(key).then((result: Record<string, unknown>) => {
                 console.log("***** result", result);
                 decryptValue(result[key] as string | undefined).then((decryptedValue) => {
                     callback(decryptedValue);
@@ -133,6 +146,35 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         }
     };
 
+    const importWallet = (seedPhrase: string): void => {
+        console.log("-------------- importWallet --------------");
+        // mnemonic 12 words
+        const mnemonic = seedPhrase;
+
+        // generate key pair
+        const ec = new elliptic.ec("secp256k1");
+        const key = ec.genKeyPair({ entropy: bip39.mnemonicToSeedSync(mnemonic, "account0") });
+
+        // generate address
+        const publicKey = key.getPublic().encode("hex", true);
+        const sha256 = ethers.sha256("0x" + publicKey).slice(2);
+        const ripemd160 = ethers.ripemd160("0x" + sha256).slice(2);
+        const checksum = ethers.sha256("0x" + ripemd160).slice(2, 10);
+        const address = ripemd160 + checksum;
+        console.log("***** address", address);
+
+        // save to storage
+        setSeedPhrase(mnemonic);
+        setWallet(address);
+        setWalletList([...walletList, address]);
+        setNameList([...nameList, "Account 0"]);
+        setVisibleWalletList([...visibleWalletList, true]);
+        setSelectedWalletIndex(walletList.length);
+        setName("Account 0");
+        console.log("***** walletList length", walletList.length);
+
+        console.log("-------------- End of importWallet --------------");
+    }
     const setToken = (token: string): void => {
         setTokenState(token);
         const expirationTime = Date.now() + 3600 * 1000; // 1 hour
@@ -147,6 +189,13 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         }).catch((error: unknown) => {
             console.error("Error removing token and token expiration:", error);
         });
+    };
+
+    const getPrivateKeyFromIndex = (index: number): string => {
+        const ec = new elliptic.ec("secp256k1");
+
+        const key = ec.genKeyPair({ entropy: bip39.mnemonicToSeedSync(seedPhrase || "", `account${index}`) });
+        return key.getPrivate().toString("hex");
     };
 
     const setSeedPhrase = (seedPhrase: string): void => {
@@ -239,6 +288,8 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
                 walletList,
                 nameList,
                 visibleWalletList,
+                tmpDestinationWallet,
+                inputWordsBackup,
                 setSeedPhrase,
                 setWallet,
                 setPassword,
@@ -256,6 +307,10 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
                 setNameListState,
                 setSelectedWalletIndexState,
                 setVisibleWalletListState,
+                setTmpDestinationWalletState,
+                getPrivateKeyFromIndex,
+                importWallet,
+                setInputWordsBackup
             }}
         >
             {children}

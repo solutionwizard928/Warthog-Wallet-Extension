@@ -14,9 +14,11 @@ interface NetworkDropdownProps {
     onSelectNetwork: (network: Network) => void;
     handleSwap: () => void;
     isSwapped: boolean;
+    amount: number;
+    setAmount: (amount: number) => void;
 }
 
-const NetworkDropdown: React.FC<NetworkDropdownProps> = ({ networks, selectedNetwork, onSelectNetwork, handleSwap, isSwapped }) => {
+const NetworkDropdown: React.FC<NetworkDropdownProps> = ({ networks, selectedNetwork, onSelectNetwork, handleSwap, isSwapped, amount, setAmount }) => {
     const [isDropdownVisible, setDropdownVisible] = useState(false);
 
     const toggleDropdown = () => setDropdownVisible((prev) => !prev);
@@ -35,13 +37,13 @@ const NetworkDropdown: React.FC<NetworkDropdownProps> = ({ networks, selectedNet
                     <div className="text-right">
                         {isSwapped ? (
                             <>
-                                <p className="text-white text-lg">$0.00</p>
-                                <p className="text-white/50 text-sm">0 {selectedNetwork?.name}</p>
+                                <p className="text-white text-lg">${amount}</p>
+                                <p className="text-white/50 text-sm flex"><input type="number" value={amount} className="block w-[110px] mr-[3px] no-spinner border-none bg-transparent outline-none text-right" onChange={(e) => setAmount(parseFloat(e.target.value))} /> {selectedNetwork?.name}</p>
                             </>
                         ) : (
                             <>
-                                <p className="text-white text-lg">0 {selectedNetwork?.name}</p>
-                                <p className="text-white/50 text-sm">$0.00</p>
+                                <p className="text-white text-lg flex"><input type="number" value={amount} className="block w-[110px] mr-[3px] no-spinner border-none bg-transparent outline-none text-right" onChange={(e) => setAmount(parseFloat(e.target.value))} /> {selectedNetwork?.name}</p>
+                                <p className="text-white/50 text-sm">${amount}</p>
                             </>
                         )}
                     </div>

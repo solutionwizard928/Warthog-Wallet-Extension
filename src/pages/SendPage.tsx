@@ -5,6 +5,7 @@ import Button from "../components/Button";
 import Header from "../components/Header";
 import useWallet from "../hooks/useWallet"
 import { formatWalletAddress } from "../utils"
+
 interface AccountType {
     id: number,
     name: string,
@@ -17,7 +18,7 @@ interface AccountType {
 function SendPage() {
     const navigate = useNavigate();
 
-    const { name, wallet, nameList, walletList, visibleWalletList, setSelectedWalletIndex, setName, setWallet } = useWallet();
+    const { name, wallet, nameList, walletList, visibleWalletList, setSelectedWalletIndex, setName, setWallet, setTmpDestinationWalletState } = useWallet();
 
     const [accounts, setAccounts] = useState<AccountType[]>([]);
     const [isDropdownVisible, setDropdownVisible] = useState(false);
@@ -41,6 +42,7 @@ function SendPage() {
         if (publicAddress === "") {
             setError("Please enter a public address");
         } else {
+            setTmpDestinationWalletState(publicAddress);
             navigate("/sendstep2");
         }
     };
