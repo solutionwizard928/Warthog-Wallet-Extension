@@ -2,10 +2,10 @@ import { useState, useCallback } from "react";
 import BackButton from "../components/BackButton";
 import Button from "../components/Button";
 import { useNavigate } from "react-router-dom";
-// import useWallet from "../hooks/useWallet";
+import useWallet from "../hooks/useWallet";
 
 function ImportPage() {
-    // const { setSeedPhrase, setWallet } = useWallet();
+    const { importWallet } = useWallet();
     const navigate = useNavigate();
     const [inputWords, setInputWords] = useState<string[]>(Array(12).fill(""));
     const [isProcessing, setIsProcessing] = useState(false);
@@ -42,9 +42,7 @@ function ImportPage() {
 
         try {
             const seedPhrase = inputWords.join(" ");
-            console.log('seedPhrase', seedPhrase);
-            // const wallet = ;
-
+            importWallet(seedPhrase);
             // setSeedPhrase(seedPhrase);
             // setWallet(wallet.address);
             setTimeout(() => {

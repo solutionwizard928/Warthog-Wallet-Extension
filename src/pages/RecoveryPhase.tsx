@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import Button from '../components/Button';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
@@ -18,10 +17,6 @@ const RecoveryPhase = () => {
         a.click();
         window.URL.revokeObjectURL(url);
     };
-
-    useEffect(() => {
-        console.log(seedPhrase);
-    }, [seedPhrase]);
 
     return (
         <div className="min-h-screen container relative">
