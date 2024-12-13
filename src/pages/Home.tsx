@@ -63,12 +63,22 @@ const Home: React.FC<Props> = ({ setSelectedActivity }) => {
                     console.log("**** here is Home page response data", data);
                     setBalance(data?.balance ? parseFloat(data?.balance) : 0);
                     console.log("**** here is Home page response data balance", data?.balance);
-                    setBalanceUSD(data?.balance ? parseFloat(data?.balance) : 0);
                 })
                 .catch((error) => {
                     console.error("Error fetching balance:", error);
                 });
         }
+    }
+
+    const updateBalanceUSD = () => {
+        axios.get(`${import.meta.env.VITE_APP_PRICE_API_URL}`)
+            .then((response) => {
+                const data = response?.data?.warthog;
+                setBalanceUSD(data?.usd ? parseFloat(data?.usd) : 0);
+            })
+            .catch((error) => {
+                console.error("Error fetching balance:", error);
+            });
     }
 
     useEffect(() => {
@@ -77,7 +87,11 @@ const Home: React.FC<Props> = ({ setSelectedActivity }) => {
             updateBalance();
 
             const intervalId = setInterval(updateBalance, 1500);
-            return () => clearInterval(intervalId);
+            const intervalIdPrice = setInterval(updateBalanceUSD, 7000);
+            return () => {
+                clearInterval(intervalId);
+                clearInterval(intervalIdPrice);
+            };
         }
     }, []);
 
@@ -86,12 +100,12 @@ const Home: React.FC<Props> = ({ setSelectedActivity }) => {
             <div className="p-2.5 bg-white/10 w-full rounded-48 backdrop-blur-[9px] flex-col justify-center items-center gap-4 inline-flex">
                 <ProfileHeader />
                 <WalletInfo wallet={wallet} onCopy={() => copyToClipboard(wallet || "")} isCopied={isCopied} />
-                <Balance balance={balance ? (balance.toFixed(2)).toString() : "0"} usdValue={balanceUSD ? (balanceUSD.toFixed(2)).toString() : "0"} />
+                <Balance balance={balance ? parseFloat(balance.toFixed(2)) : 0} usdValue={balanceUSD ? parseFloat(balanceUSD.toFixed(2)) : 0} />
                 <ActionButtons />
             </div>
             <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
             {activeTab === Tab.Tokens ? (
-                <TokenItem token="WART" balance={balance ? (balance.toFixed(2)).toString() : "0"} usdValue={balanceUSD ? (balanceUSD.toFixed(2)).toString() : "0" } />
+                <TokenItem token="WART" balance={balance ? parseFloat(balance.toFixed(2)) : 0} usdValue={balanceUSD ? parseFloat(balanceUSD.toFixed(2)) : 0} />
             ) : (
                 <ActivityItem activities={activities} onActivityClick={handleActivityClick} />
             )}
