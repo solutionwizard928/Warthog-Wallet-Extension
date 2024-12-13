@@ -57,7 +57,7 @@ const AccountCard = ({
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
-                    <div className="flex flex-col items-end">
+                    <div className="flex flex-col items-end hidden">
                         <div className="text-white text-xl font-medium">{balance}</div>
                         <div className="text-white/50 text-lg">${balanceUSD}</div>
                     </div>

@@ -46,7 +46,7 @@ const Home: React.FC<Props> = ({ setSelectedActivity }) => {
     const copyToClipboard = useCallback((text: string) => {
         navigator.clipboard.writeText(text);
         setIsCopied(true);
-        setTimeout(() => setIsCopied(false), 2000);
+        setTimeout(() => setIsCopied(false), 1000);
     }, []);
 
     const handleActivityClick = (activityItem: Activity) => {
@@ -58,8 +58,11 @@ const Home: React.FC<Props> = ({ setSelectedActivity }) => {
         if (wallet) {
             axios.get(`${import.meta.env.VITE_APP_API_URL}/account/${wallet}/balance`)
                 .then((response) => {
-                    setBalance(response?.data?.balance ? parseFloat(response?.data?.balance) : 0);
-                    setBalanceUSD(response?.data?.balanceUSD ? parseFloat(response?.data?.balanceUSD) : 0);
+                    console.log("**** here is Home page response", response);
+                    const data = response?.data?.data;
+                    console.log("**** here is Home page response data", data);
+                    setBalance(data?.balance ? parseFloat(data?.balance) : 0);
+                    console.log("**** here is Home page response data balance", data?.balance);
                 })
                 .catch((error) => {
                     console.error("Error fetching balance:", error);
@@ -67,13 +70,28 @@ const Home: React.FC<Props> = ({ setSelectedActivity }) => {
         }
     }
 
+    const updateBalanceUSD = () => {
+        axios.get(`${import.meta.env.VITE_APP_XEGGEX_API_URL}`)
+            .then((response) => {
+                const data = response?.data;
+                setBalanceUSD(data?.last_price ? parseFloat(data?.last_price) : 0);
+            })
+            .catch((error) => {
+                console.error("Error fetching balance:", error);
+            });
+    }
+
     useEffect(() => {
         console.log("**** here is Home page");
         if (wallet) {
             updateBalance();
 
-            const intervalId = setInterval(updateBalance, 3000);
-            return () => clearInterval(intervalId);
+            const intervalIdPrice = setInterval(updateBalanceUSD, 1500);
+            const intervalId = setInterval(updateBalance, 1500);
+            return () => {
+                clearInterval(intervalIdPrice);
+                clearInterval(intervalId);
+            };
         }
     }, []);
 
@@ -82,12 +100,12 @@ const Home: React.FC<Props> = ({ setSelectedActivity }) => {
             <div className="p-2.5 bg-white/10 w-full rounded-48 backdrop-blur-[9px] flex-col justify-center items-center gap-4 inline-flex">
                 <ProfileHeader />
                 <WalletInfo wallet={wallet} onCopy={() => copyToClipboard(wallet || "")} isCopied={isCopied} />
-                <Balance balance={balance ? balance.toString() : "0"} usdValue={balanceUSD ? balanceUSD.toString() : "0"} />
+                <Balance balance={balance ? parseFloat(balance.toFixed(2)) : 0} usdValue={balanceUSD ? parseFloat(balanceUSD.toFixed(2)) : 0} />
                 <ActionButtons />
             </div>
             <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
             {activeTab === Tab.Tokens ? (
-                <TokenItem token="WART" balance={balance ? balance.toString() : "0"} usdValue={balanceUSD ? balanceUSD.toString() : "0" } />
+                <TokenItem token="WART" balance={balance ? parseFloat(balance.toFixed(2)) : 0} usdValue={balanceUSD ? parseFloat(balanceUSD.toFixed(2)) : 0} />
             ) : (
                 <ActivityItem activities={activities} onActivityClick={handleActivityClick} />
             )}

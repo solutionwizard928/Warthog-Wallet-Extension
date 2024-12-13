@@ -51,6 +51,7 @@ function ImportPage() {
         } catch (e) {
             console.log("Failed to recover wallet:", e);
             setError("Invalid recovery phrase. Please try again.");
+        } finally {
             setIsProcessing(false);
         }
     };
