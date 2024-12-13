@@ -71,10 +71,10 @@ const Home: React.FC<Props> = ({ setSelectedActivity }) => {
     }
 
     const updateBalanceUSD = () => {
-        axios.get(`${import.meta.env.VITE_APP_PRICE_API_URL}`)
+        axios.get(`${import.meta.env.VITE_APP_XEGGEX_API_URL}`)
             .then((response) => {
-                const data = response?.data?.warthog;
-                setBalanceUSD(data?.usd ? parseFloat(data?.usd) : 0);
+                const data = response?.data;
+                setBalanceUSD(data?.last_price ? parseFloat(data?.last_price) : 0);
             })
             .catch((error) => {
                 console.error("Error fetching balance:", error);
@@ -86,11 +86,11 @@ const Home: React.FC<Props> = ({ setSelectedActivity }) => {
         if (wallet) {
             updateBalance();
 
+            const intervalIdPrice = setInterval(updateBalanceUSD, 1500);
             const intervalId = setInterval(updateBalance, 1500);
-            const intervalIdPrice = setInterval(updateBalanceUSD, 7000);
             return () => {
-                clearInterval(intervalId);
                 clearInterval(intervalIdPrice);
+                clearInterval(intervalId);
             };
         }
     }, []);
