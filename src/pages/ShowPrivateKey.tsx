@@ -6,7 +6,7 @@ import useWallet from "../hooks/useWallet";
 
 
 function ShowPrivateKey() {
-    const { password, seedPhrase, name } = useWallet();
+    const { password, seedPhrase, name, selectedWalletIndex, getPrivateKeyFromIndex } = useWallet();
     const navigate = useNavigate();
     const [enteredPassword, setEnteredPassword] = useState("");
     const [error, setError] = useState<string | null>(null);
@@ -75,8 +75,8 @@ function ShowPrivateKey() {
             {isPrivateKeyVisible && seedPhrase && (
                 <div className="mt-6">
                     <p className="text-white text-sm">Private Key</p>
-                    <div className="px-3 py-3 rounded-lg border border-[#fdb913]/25 backdrop-blur-md flex items-center">
-                        <div className="text-white text-lg ">{seedPhrase}</div>
+                    <div className="px-3 py-3 rounded-lg border border-[#fdb913]/25 backdrop-blur-md flex items-center w-[400px]">
+                        <div className="text-white text-lg w-full break-words">{getPrivateKeyFromIndex(selectedWalletIndex)}</div>
                     </div>
 
                     <p className="mt-4 px-2.5 py-2 bg-[#d9d9d9]/10 rounded-lg">

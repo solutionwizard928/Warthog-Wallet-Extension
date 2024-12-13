@@ -49,6 +49,7 @@ function SendFinalStep() {
     const [transactionStatus, setTransactionStatus] = useState<'idle' | 'processing' | 'success' | 'error'>('idle');
     const [transactionHash, setTransactionHash] = useState<string>('');
     const [transactionError, setTransactionError] = useState<string>('');
+    const [nonce, setNonce] = useState<number>(0);
 
     const selectUser = (id: number) => {
         setName(nameList[id]);
@@ -75,7 +76,8 @@ function SendFinalStep() {
             const headResponse = (await axios.get(`${import.meta.env.VITE_APP_API_URL}/chain/head`)).data;
             const pinHash = headResponse.data.pinHash;
             const pinHeight = headResponse.data.pinHeight as number;
-            const nonceId = 0;
+            const nonceId = nonce + 1;
+            setNonce(nonceId);
             const rawFeeE8 = "9999";
             const result = (await axios.get(`${import.meta.env.VITE_APP_API_URL}/tools/encode16bit/from_e8/` + rawFeeE8)).data;
             const feeE8 = result.data.roundedE8;
@@ -140,7 +142,7 @@ function SendFinalStep() {
                     setTransactionError(res.data.error);
                 }
                 else {
-                    setTransactionHash(res.data.hash);
+                    setTransactionHash(res?.data?.data?.txHash);
                     setTransactionStatus('success');
                 }
             }).catch((error) => {
@@ -316,7 +318,7 @@ function SendFinalStep() {
                                 <h3 className="text-white text-xl font-semibold mb-2">Transaction Successful!</h3>
                                 <p className="text-white/70 mb-4">Your transaction has been processed successfully.</p>
                                 <p className="text-sm text-white/50 break-all mb-6">
-                                    Transaction Hash: {formatWalletAddress(transactionHash)}
+                                    Transaction Hash: {transactionHash}
                                 </p>
                                 <Button
                                     variant="primary"
