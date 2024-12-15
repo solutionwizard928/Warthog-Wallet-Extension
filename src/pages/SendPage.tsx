@@ -5,6 +5,7 @@ import Button from "../components/Button";
 import Header from "../components/Header";
 import useWallet from "../hooks/useWallet"
 import { formatWalletAddress } from "../utils"
+import Jazzicon from "react-jazzicon/dist/Jazzicon";
 
 interface AccountType {
     id: number,
@@ -18,7 +19,7 @@ interface AccountType {
 function SendPage() {
     const navigate = useNavigate();
 
-    const { name, wallet, nameList, walletList, visibleWalletList, setSelectedWalletIndex, setName, setWallet, setTmpDestinationWalletState } = useWallet();
+    const { name, wallet, nameList, selectedWalletIndex, walletList, visibleWalletList, setSelectedWalletIndex, setName, setWallet, setTmpDestinationWalletState } = useWallet();
 
     const [accounts, setAccounts] = useState<AccountType[]>([]);
     const [isDropdownVisible, setDropdownVisible] = useState(false);
@@ -81,11 +82,12 @@ function SendPage() {
                         onClick={toggleDropdown}
                     >
                         <div className="flex items-center gap-3">
-                            <img
+                            {/* <img
                                 className="w-12 h-12 rounded-full object-cover"
                                 src={"profile-image.png"}
                                 alt="Profile"
-                            />
+                            /> */}
+                            { <Jazzicon diameter={48} seed={selectedWalletIndex} /> }
                             <div>
                                 <p className="text-white text-lg font-semibold">{name}</p>
                                 <p className="text-white/50 text-xs">{formatWalletAddress(wallet || "")}</p>
@@ -101,11 +103,14 @@ function SendPage() {
                                     className="flex items-center gap-3 p-4 hover:bg-white/10 cursor-pointer"
                                     onClick={() => selectUser(account.id)}
                                 >
-                                    <img
+                                    {/* <img
                                         className="w-10 h-10 rounded-full object-cover"
                                         src={"profile-image.png"}
                                         alt={account.name}
-                                    />
+                                    /> */}
+                                    <div className="w-10 h-10">
+                                        { <Jazzicon diameter={40} seed={account.id} /> }
+                                    </div>
                                     <div>
                                         <p className="text-white text-sm font-semibold">{account.name}</p>
                                         <p className="text-white/50 text-xs">{account.address}</p>

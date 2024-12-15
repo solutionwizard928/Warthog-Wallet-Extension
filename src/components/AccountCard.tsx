@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { IoMdMore } from "react-icons/io";
 import { formatWalletAddress } from "../utils";
+import Jazzicon from "react-jazzicon/dist/Jazzicon";
 
 const AccountCard = ({
     id,
@@ -46,11 +47,12 @@ const AccountCard = ({
         <>
             <div className="flex justify-between items-center w-full mt-6 relative">
                 <div className="flex items-center gap-4">
-                    <img
+                    {/* <img
                         className="w-12 h-12 rounded-full object-cover"
                         src="profile-image.png"
                         alt={`${name} Profile`}
-                    />
+                    /> */}
+                    <Jazzicon diameter={48} seed={id} />
                     <div>
                         <div className="text-white text-xl font-semibold">{name}</div>
                         <div className="text-white/50 text-xs">{formatWalletAddress(address)}</div>

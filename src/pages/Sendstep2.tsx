@@ -10,6 +10,7 @@ import { formatWalletAddress } from "../utils";
 import axios from "axios";
 import { ethers } from "ethers";
 import secp256k1 from "secp256k1";
+import Jazzicon from "react-jazzicon/dist/Jazzicon";
 
 interface AccountType {
     id: number,
@@ -193,7 +194,8 @@ function SendFinalStep() {
 
                 <p className="text-white text-sm mt-3">To</p>
                 <div className="flex items-center gap-3 p-4 rounded-lg border border-primary/25 backdrop-blur-md">
-                    <img className="w-12 h-12 rounded-full" src="profile-image.png" alt="Profile" />
+                    {/* <img className="w-12 h-12 rounded-full" src="profile-image.png" alt="Profile" /> */}
+                    { <Jazzicon diameter={48} seed={1000} /> }
                     <div>
                         <p className="text-white text-lg font-semibold">Receiver</p>
                         <p className="text-white/50 text-xs">{formatWalletAddress(tmpDestinationWallet || "")}</p>

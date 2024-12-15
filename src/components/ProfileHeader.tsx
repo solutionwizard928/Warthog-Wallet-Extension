@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { IoSettingsOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
+import Jazzicon from "react-jazzicon/dist/Jazzicon";
 import useWallet from "../hooks/useWallet";
 
 const ProfileHeader: React.FC = () => {
+    const { selectedWalletIndex } = useWallet();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { name, clearToken } = useWallet();
     const navigate = useNavigate();
@@ -40,11 +42,7 @@ const ProfileHeader: React.FC = () => {
     return (
         <div className="flex justify-between w-full">
             <div className="flex items-center gap-3">
-                <img
-                    src="profile-image.png"
-                    alt="Profile"
-                    className="w-[70px] h-[70px] rounded-full object-cover"
-                />
+                <Jazzicon diameter={60} seed={selectedWalletIndex} />
                 <div className="grid gap-1">
                     <h1 className="text-white text-xl font-semibold">{name}</h1>
                     <p className="text-white/30 text-xs font-normal">Connected Wallet</p>
