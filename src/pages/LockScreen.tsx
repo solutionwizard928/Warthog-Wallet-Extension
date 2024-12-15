@@ -54,7 +54,7 @@ function LockScreen() {
                     <input
                         id="password"
                         type="password"
-                        className={`w-full bg-primary/10 text-white border rounded-lg px-4 py-2 mt-1 focus:outline-none ${error ? "border-red-500" : "border-primary/50"
+                        className={`w-full bg-primary/10 text-white border rounded-lg px-4 py-2 mt-1 outline-none focus:outline-none ${error ? "border-red-500" : "border-primary/50"
                             }`}
                         placeholder="Your password..."
                         value={enteredPassword}
@@ -77,9 +77,8 @@ function LockScreen() {
                 </Button>
 
                 <div className="w-full text-center mt-3">
-                    <span className="text-white text-sm font-medium underline">Need help</span>
-                    <span className="text-white">? Contact </span>
-                    <span className="text-primary text-sm font-medium">Warthog Support</span>
+                    <span className="text-white text-sm font-medium">Need help?</span>
+                    <a className="text-primary text-sm font-medium underline" href="https://discord.com/invite/QMDV8bGTdQ" target="_blank"> Join our Discord</a>
                 </div>
             </div>
         </div>
