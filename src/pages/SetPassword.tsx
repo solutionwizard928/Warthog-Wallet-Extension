@@ -22,7 +22,6 @@ const SetPassword: React.FC = () => {
     const handleSubmit = () => {
         if (validatePasswords()) {
             setPassword(password);
-            console.log("after save password");
             navigate('/');
         }
     };

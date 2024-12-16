@@ -18,6 +18,7 @@ import AccountDetails from './pages/AccountDetails';
 import ShowPrivateKey from './pages/ShowPrivateKey';
 import useWallet from './hooks/useWallet';
 import SendFinalStep from './pages/Sendstep2';
+import SelectNode from './pages/SelectNode';
 
 interface Activity {
   date: string;
@@ -76,6 +77,7 @@ const App: React.FC = () => {
       <Route path="/send" element={<SendPage />} />
       <Route path="/sendstep2" element={<SendFinalStep />} />
       <Route path="/manage-account" element={<ManageAccounts />} />
+      <Route path="/select-node" element={<SelectNode />} />      
       <Route path="/account-details" element={<AccountDetails />} />
       <Route path="/private-key" element={<ShowPrivateKey />} />
     </Routes>

@@ -14,7 +14,7 @@ interface AccountType {
 }
 
 function ManageAccounts() {
-    const { name, nameList, walletList, visibleWalletList, setName, setWallet, setVisibleWalletList, setSelectedWalletIndex } = useWallet();
+    const { nameList, walletList, visibleWalletList, setName, setWallet, setSelectedWalletIndex } = useWallet();
 
     const [accounts, setAccounts] = useState<AccountType[]>([] as AccountType[]);
 
@@ -36,10 +36,10 @@ function ManageAccounts() {
         setSelectedWalletIndex(id);
     }
 
-    const removeAccount = (id: number) => {
-        setVisibleWalletList(visibleWalletList.map((visible, index) => index !== id ? visible : false));
-        console.log(`${name} removed from accounts`);
-    }
+    // const removeAccount = (id: number) => {
+    //     setVisibleWalletList(visibleWalletList.map((visible, index) => index !== id ? visible : false));
+    //     console.log(`${name} removed from accounts`);
+    // }
 
     useEffect(() => {
         if (nameList.length !== walletList.length) {
@@ -81,7 +81,6 @@ function ManageAccounts() {
                             {...account}
                             isLast={index === filteredAccounts.length - 1}
                             setPrimaryAccount={setPrimaryAccount}
-                            removeAccount={removeAccount}
                         />
                     ))
                 ) : (

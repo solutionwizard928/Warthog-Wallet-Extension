@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
 import { formatWalletAddress } from '../utils';
+import Jazzicon from 'react-jazzicon/dist/Jazzicon';
+import useWallet from '../hooks/useWallet';
 
 interface AccountType {
     id: number,
@@ -18,6 +20,7 @@ interface UserDropdownProps {
 }
 
 const UserDropdown: React.FC<UserDropdownProps> = ({ users, selectedUser, onSelectUser }) => {
+    const { selectedWalletIndex } = useWallet();
     const [isDropdownVisible, setDropdownVisible] = useState(false);
 
     const toggleDropdown = () => setDropdownVisible((prev) => !prev);
@@ -29,11 +32,12 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ users, selectedUser, onSele
                 onClick={toggleDropdown}
             >
                 <div className="flex items-center gap-3">
-                    <img
+                    {/* <img
                         className="w-12 h-12 rounded-full object-cover"
                         src={"profile-image.png"}
                         alt="Profile"
-                    />
+                    /> */}
+                    <Jazzicon diameter={48} seed={selectedWalletIndex} />
                     <div>
                         <p className="text-white text-lg font-semibold">{selectedUser?.name}</p>
                         <p className="text-white/50 text-xs">{formatWalletAddress(selectedUser?.address || "")}</p>
@@ -52,11 +56,12 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ users, selectedUser, onSele
                                 setDropdownVisible(false);
                             }}
                         >
-                            <img
+                            {/* <img
                                 className="w-10 h-10 rounded-full object-cover"
                                 src={"profile-image.png"}
                                 alt={user.name}
-                            />
+                            /> */}
+                            <Jazzicon diameter={40} seed={user.id} />
                             <div>
                                 <p className="text-white text-sm font-semibold">{user.name}</p>
                                 <p className="text-white/50 text-xs">{formatWalletAddress(user.address || "")}</p>

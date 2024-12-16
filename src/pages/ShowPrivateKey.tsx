@@ -3,6 +3,7 @@ import Button from "../components/Button";
 import Header from "../components/Header";
 import { useNavigate } from "react-router-dom";
 import useWallet from "../hooks/useWallet";
+import Jazzicon from "react-jazzicon/dist/Jazzicon";
 
 
 function ShowPrivateKey() {
@@ -43,11 +44,12 @@ function ShowPrivateKey() {
             <Header title="Show Private Key" />
 
             <div className="flex items-center gap-4 mt-6">
-                <img
+                {/* <img
                     className="w-20 h-20 rounded-full object-cover"
                     src="profile-image.png"
                     alt="Profile"
-                />
+                /> */}
+                { <Jazzicon diameter={80} seed={selectedWalletIndex} /> }
                 <div>
                     <div className="text-xl font-semibold text-white">{name}</div>
                     <div className="text-xs text-white/50">Connected Wallet</div>

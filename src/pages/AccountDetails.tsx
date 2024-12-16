@@ -3,6 +3,7 @@ import BackButton from "../components/BackButton";
 import Button from "../components/Button";
 import { useNavigate } from "react-router-dom";
 import useWallet from "../hooks/useWallet";
+import Jazzicon from "react-jazzicon/dist/Jazzicon";
 
 function IconButton({ iconSrc, label, onClick }: { iconSrc: string; label: string; onClick?: () => void }) {
     return (
@@ -27,7 +28,7 @@ function useDebounce(value: string | null, delay: number): string | null {
 }
 
 function AccountDetails() {
-    const { wallet, name, setName } = useWallet();
+    const { wallet, name, selectedWalletIndex, setName } = useWallet();
     const [copyLabel, setCopyLabel] = useState("Copy");
     const [isEditing, setIsEditing] = useState(false);
     const [tempName, setTempName] = useState<string | null>(name);
@@ -64,11 +65,12 @@ function AccountDetails() {
             <BackButton />
 
             <div className="flex justify-center items-center gap-4 mt-6">
-                <img
+                {/* <img
                     className="w-20 h-20 rounded-full object-cover"
                     src="profile-image.png"
                     alt="Profile"
-                />
+                /> */}
+                { <Jazzicon diameter={80} seed={selectedWalletIndex} />}
                 <div>
                     <div className="text-xl font-semibold text-white">
                         {isEditing ? (
