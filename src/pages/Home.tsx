@@ -36,17 +36,14 @@ const activities: Activity[] = [
 ];
 
 const Home: React.FC<Props> = ({ setSelectedActivity }) => {
-    const { wallet } = useWallet();
+    const { wallet, selectedNodeIndex, nodeList } = useWallet();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<Tab>(Tab.Tokens);
-    const [isCopied, setIsCopied] = useState(false);
     const [balance, setBalance] = useState(0);
     const [balanceUSD, setBalanceUSD] = useState(0);
 
     const copyToClipboard = useCallback((text: string) => {
         navigator.clipboard.writeText(text);
-        setIsCopied(true);
-        setTimeout(() => setIsCopied(false), 1000);
     }, []);
 
     const handleActivityClick = (activityItem: Activity) => {
@@ -56,7 +53,7 @@ const Home: React.FC<Props> = ({ setSelectedActivity }) => {
 
     const updateBalance = () => {
         if (wallet) {
-            axios.get(`${import.meta.env.VITE_APP_API_URL}/account/${wallet}/balance`)
+            axios.get(`${nodeList[selectedNodeIndex]}/account/${wallet}/balance`)
                 .then((response) => {
                     console.log("**** here is Home page response", response);
                     const data = response?.data?.data;
@@ -99,7 +96,7 @@ const Home: React.FC<Props> = ({ setSelectedActivity }) => {
         <div className="container min-h-screen">
             <div className="p-2.5 bg-white/10 w-full rounded-48 backdrop-blur-[9px] flex-col justify-center items-center gap-4 inline-flex">
                 <ProfileHeader />
-                <WalletInfo wallet={wallet} onCopy={() => copyToClipboard(wallet || "")} isCopied={isCopied} />
+                <WalletInfo wallet={wallet} onCopy={() => copyToClipboard(wallet || "")} />
                 <Balance balance={balance ? parseFloat(balance.toFixed(2)) : 0} usdValue={balanceUSD ? parseFloat(balanceUSD.toFixed(2)) : 0} />
                 <ActionButtons />
             </div>

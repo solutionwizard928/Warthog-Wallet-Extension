@@ -10,8 +10,10 @@ interface WalletContextProps {
     wallet: string | null;
     walletList: string[];
     nameList: string[];
+    nodeList: string[];
     visibleWalletList: boolean[];
     selectedWalletIndex: number;
+    selectedNodeIndex: number;
     password: string | null;
     name: string | null;
     tmpDestinationWallet: string | null;
@@ -21,7 +23,9 @@ interface WalletContextProps {
     setWallet: (wallet: string) => void;
     setPassword: (password: string) => void;
     setWalletList: (walletList: string[]) => void;
+    setNodeList: (nodeList: string[]) => void;
     setNameList: (nameList: string[]) => void;
+    setSelectedNodeIndex: (selectedNodeIndex: number) => void;
     setVisibleWalletList: (visibleWalletList: boolean[]) => void;
     setSelectedWalletIndex: (selectedWalletIndex: number) => void;
     setInputWordsBackup: (inputWordsBackup: string[]) => void;
@@ -32,12 +36,23 @@ interface WalletContextProps {
     newWallet: () => void;
     importWallet: (seedPhrase: string) => void;
     setWalletListState: (walletList: string[]) => void;
+    setNodeListState: (nodeList: string[]) => void;
     setNameListState: (nameList: string[]) => void;
     setSelectedWalletIndexState: (selectedWalletIndex: number) => void;
+    setSelectedNodeIndexState: (selectedNodeIndex: number) => void;
     setVisibleWalletListState: (visibleWalletList: boolean[]) => void;
     setTmpDestinationWalletState: (tmpDestinationWallet: string) => void;
     getPrivateKeyFromIndex: (index: number) => string;
 }
+
+const defaultNodeList = [
+    'http://193.218.118.57:3001',
+    'http://185.209.228.16:3001', 
+    'http://89.117.150.162:3001', 
+    'http://51.75.21.134:3001',
+    'http://62.72.44.89:3001',
+    'https://dev.node-s.com:3001'
+];
 
 const WalletContext = createContext<WalletContextProps | undefined>(undefined);
 
@@ -50,7 +65,9 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     const [name, setNameState] = useState<string | null>(null);
     const [walletList, setWalletListState] = useState<string[]>([]);
     const [selectedWalletIndex, setSelectedWalletIndexState] = useState<number>(0);
+    const [selectedNodeIndex, setSelectedNodeIndexState] = useState<number>(0);
     const [nameList, setNameListState] = useState<string[]>([]);
+    const [nodeList, setNodeListState] = useState<string[]>([]);
     const [token, setTokenState] = useState<string | null>(null);
     const [visibleWalletList, setVisibleWalletListState] = useState<boolean[]>([]);
     const [tmpDestinationWallet, setTmpDestinationWalletState] = useState<string | null>(null);
@@ -136,6 +153,7 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
             setNameList([...nameList, "Account 0"]);
             setVisibleWalletList([...visibleWalletList, true]);
             setSelectedWalletIndex(walletList.length);
+            setNodeList(defaultNodeList);
             setName("Account 0");
             console.log("***** walletList length", walletList.length);
 
@@ -170,6 +188,8 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         setNameList([...nameList, "Account 0"]);
         setVisibleWalletList([...visibleWalletList, true]);
         setSelectedWalletIndex(walletList.length);
+        setNodeList(defaultNodeList);
+        console.log("defaultNodeList", defaultNodeList)
         setName("Account 0");
         console.log("***** walletList length", walletList.length);
 
@@ -213,6 +233,11 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         saveToBrowserStorage("walletList", walletList.join(","));
     };
 
+    const setNodeList = (nodeList: string[]): void => {
+        setNodeListState(nodeList);
+        saveToBrowserStorage("nodeList", nodeList.join(","));
+    }
+
     const setNameList = (nameList: string[]): void => {
         setNameListState(nameList);
         saveToBrowserStorage("nameList", nameList.join(","));
@@ -222,6 +247,11 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         setSelectedWalletIndexState(selectedWalletIndex);
         saveToBrowserStorage("selectedWalletIndex", selectedWalletIndex.toString());
     };
+
+    const setSelectedNodeIndex = (selectedNodeIndex: number): void => {
+        setSelectedNodeIndexState(selectedNodeIndex);
+        saveToBrowserStorage("selectedNodeIndex", selectedNodeIndex.toString());
+    }
 
     const setPassword = (password: string): void => {
         setPasswordState(password);
@@ -255,11 +285,13 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         loadFromChromeStorage("wallet", setWalletState);
         loadFromChromeStorage("walletList", (walletList) => setWalletListState(walletList ? walletList.split(",") : []));
         loadFromChromeStorage("nameList", (nameList) => setNameListState(nameList ? nameList.split(",") : []));
+        loadFromChromeStorage("nodeList", (nodeList) => setNodeList(nodeList ? nodeList.split(",") : []));
         loadFromChromeStorage("visibleWalletList", (visibleWalletList) => {
             const boolArray = visibleWalletList ? visibleWalletList.split(",").map(val => val === "true") : [];
             setVisibleWalletListState(boolArray);
         });
         loadFromChromeStorage("selectedWalletIndex", (selectedWalletIndex) => setSelectedWalletIndexState(selectedWalletIndex ? parseInt(selectedWalletIndex, 10) : 0));
+        loadFromChromeStorage("selectedNodeIndex", (selectedNodeIndex) => setSelectedNodeIndexState(selectedNodeIndex ? parseInt(selectedNodeIndex, 10) : 0));
         loadFromChromeStorage("password", setPasswordState);
         loadFromChromeStorage("name", setNameState);
         loadFromChromeStorage("token", setTokenState);
@@ -286,7 +318,10 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
                 name,
                 token,
                 walletList,
+                nodeList,
                 nameList,
+                selectedWalletIndex,
+                selectedNodeIndex,
                 visibleWalletList,
                 tmpDestinationWallet,
                 inputWordsBackup,
@@ -295,17 +330,20 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
                 setPassword,
                 setName,
                 setWalletList,
+                setNodeList,
                 setNameList,
                 setVisibleWalletList,
                 setSelectedWalletIndex,
+                setSelectedNodeIndex,
                 clearWalletData,
                 setToken,
                 clearToken,
                 newWallet,
-                selectedWalletIndex,
                 setWalletListState,
+                setNodeListState,
                 setNameListState,
                 setSelectedWalletIndexState,
+                setSelectedNodeIndexState,
                 setVisibleWalletListState,
                 setTmpDestinationWalletState,
                 getPrivateKeyFromIndex,

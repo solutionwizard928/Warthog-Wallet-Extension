@@ -77,6 +77,13 @@ const ProfileHeader: React.FC = () => {
                         <div className="border border-white/20 my-2" />
                         <p
                             className="text-white text-lg font-normal cursor-pointer"
+                            onClick={() => navigate('/select-node')}
+                        >
+                            Select Node
+                        </p>
+                        <div className="border border-white/20 my-2" />
+                        <p
+                            className="text-white text-lg font-normal cursor-pointer"
                             onClick={handleLockScreen}
                         >
                             Lock Screen
