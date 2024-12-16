@@ -14,11 +14,11 @@ import axios from 'axios';
 var pk = ec.genKeyPair()
 
 // alternatively read private key
-var pkhex = '8b3ec81d4f0b865c61373aea6c0add61ffb6c7b52fe27ab01b98667fa4b9f8e'
+var pkhex = '347e965851d30e0d2bdcfe03227a8a6bff018af6c37df7d53f9f0cf766a89003'
 var pk = ec.keyFromPrivate(pkhex);
 
 // convert private key to hex
-pkhex = pk.getPrivate().toString("hex")
+// var pkhex = pk.getPrivate().toString("hex")
 while (pkhex.length < 64) {
   pkhex = "0" + pkhex;
 }
@@ -28,7 +28,8 @@ console.log("private key:", pkhex)
 
 // derive public key
 var pubKey = pk.getPublic().encodeCompressed("hex");
-
+// 62419fff4a6326443961a7e87ed3c2f233ef6857bb61ea7d0d7afc88f7a343a2 
+// 027e81de8009cdac039528fd759e38ba10c9ae474fbabe1fc743941cbe99573389
 // print public key
 console.log("public key:", pubKey)
 

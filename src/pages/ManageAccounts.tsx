@@ -14,11 +14,28 @@ interface AccountType {
 }
 
 function ManageAccounts() {
-    const { nameList, walletList, visibleWalletList, setName, setWallet, setSelectedWalletIndex } = useWallet();
+    const { nameList, walletList, visibleWalletList, setName, setWallet, setSelectedWalletIndex, addAccount } = useWallet();
 
     const [accounts, setAccounts] = useState<AccountType[]>([] as AccountType[]);
-
     const [searchQuery, setSearchQuery] = useState("");
+    const [isDialogOpen, setIsDialogOpen] = useState(false); // State for dialog visibility
+    const [newAccountName, setNewAccountName] = useState("");
+
+    const handleAddAccount = () => {
+        // Logic to add the new account
+        console.log("Adding account:", newAccountName);
+
+        addAccount(newAccountName.length ? newAccountName: null);
+
+        // Reset the input and close the dialog
+        setNewAccountName("");
+        setIsDialogOpen(false);
+    };
+
+    const handleCancel = () => {
+        setNewAccountName("");
+        setIsDialogOpen(false);
+    }
 
     const filteredAccounts = accounts.filter(
         (account) =>
@@ -91,12 +108,44 @@ function ManageAccounts() {
                 <Button
                     variant="primary"
                     ariaLabel="Add Account"
-                    onClick={() => console.log("Add Account")}
+                    onClick={() => setIsDialogOpen(true)}
                     className="w-full"
                 >
                     + Add more account
                 </Button>
             </div>
+
+            {/* Popup Dialog */}
+            {isDialogOpen && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-[#1A1A1A] p-4 rounded shadow-lg w-[300px]">
+                        <h3 className="text-white text-xl font-semibold mb-4">Add new Account</h3>
+                        <input
+                            type="text"
+                            placeholder="Wallet Name"
+                            value={newAccountName}
+                            onChange={(e) => setNewAccountName(e.target.value)}
+                            className="w-full min-w-[150px] bg-[#2A2A2A] border border-primary/25 rounded-lg p-3 text-white focus:outline-none focus:border-primary"
+                        />
+                        <div className="flex justify-end mt-4">
+                            <Button
+                                variant="secondary"
+                                onClick={handleCancel} // Close dialog
+                                className="mr-2 w-full"
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                variant="primary"
+                                onClick={handleAddAccount} // Add account
+                                className="w-full"
+                            >
+                                Add
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

@@ -93,7 +93,7 @@ function SendFinalStep() {
             buf2.writeBigUInt64BE(BigInt(feeE8), 11);
             const buf3 = Buffer.from(tmpDestinationWallet?.slice(0, 40) || "", "hex");
             const buf4 = Buffer.alloc(8);
-            const amountE8 = amount * 100000000;
+            const amountE8 = Math.round(amount * 100000000);
             buf4.writeBigUInt64BE(BigInt(amountE8), 0);
             console.log(`**** amountE8:`, amountE8);
             const toSign = Buffer.concat([buf1, buf2, buf3, buf4]);
@@ -320,7 +320,7 @@ function SendFinalStep() {
                                 <h3 className="text-white text-xl font-semibold mb-2">Transaction Successful!</h3>
                                 <p className="text-white/70 mb-4">Your transaction has been processed successfully.</p>
                                 <p className="text-sm text-white/50 break-all mb-6">
-                                    Transaction Hash: {transactionHash}
+                                    Transaction Hash: <a href={`https://wartscan.io/tx/${transactionHash}`} target="_blank" rel="noopener noreferrer" className="underline">{transactionHash}</a>
                                 </p>
                                 <Button
                                     variant="primary"

@@ -1,6 +1,5 @@
 import React, { createContext, useState, useEffect, ReactNode, useCallback } from "react";
 import * as bip39 from "bip39";
-import * as elliptic from "elliptic";
 import { ethers } from "ethers";
 import { getKeyFromPassword, encrypt, decrypt } from "dha-encryption";
 import browser from "webextension-polyfill";
@@ -34,6 +33,7 @@ interface WalletContextProps {
     setToken: (token: string) => void;
     clearToken: () => void;
     newWallet: () => void;
+    addAccount: (name: string | null) => void;
     importWallet: (seedPhrase: string) => void;
     setWalletListState: (walletList: string[]) => void;
     setNodeListState: (nodeList: string[]) => void;
@@ -47,8 +47,8 @@ interface WalletContextProps {
 
 const defaultNodeList = [
     'http://193.218.118.57:3001',
-    'http://185.209.228.16:3001', 
-    'http://89.117.150.162:3001', 
+    'http://185.209.228.16:3001',
+    'http://89.117.150.162:3001',
     'http://51.75.21.134:3001',
     'http://62.72.44.89:3001',
     'https://dev.node-s.com:3001'
@@ -135,24 +135,26 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
             const mnemonic = bip39.generateMnemonic();
 
             // generate key pair
-            const ec = new elliptic.ec("secp256k1");
-            const key = ec.genKeyPair({ entropy: bip39.mnemonicToSeedSync(mnemonic, "account0") });
-
+            // const ec = new elliptic.ec("secp256k1");
+            // const key = ec.genKeyPair({ entropy: bip39.mnemonicToSeedSync(mnemonic, "account0") });
             // generate address
-            const publicKey = key.getPublic().encode("hex", true);
-            const sha256 = ethers.sha256("0x" + publicKey).slice(2);
+            // console.log("&&&& ec.priv key", key.getPrivate().toString());
+            // console.log("&&&& ec.pubk", key.getPublic().encode("hex", true));
+            // const publicKey = key.getPublic().encode("hex", true);
+            const rootNode = ethers.HDNodeWallet.fromPhrase(mnemonic, "", "m/44'/2070'/0");
+            const childNode = rootNode.derivePath("0/0");
+            const sha256 = ethers.sha256(childNode.publicKey).slice(2);
             const ripemd160 = ethers.ripemd160("0x" + sha256).slice(2);
             const checksum = ethers.sha256("0x" + ripemd160).slice(2, 10);
             const address = ripemd160 + checksum;
-            console.log("***** address", address);
 
             // save to storage
             setSeedPhrase(mnemonic);
             setWallet(address);
-            setWalletList([...walletList, address]);
-            setNameList([...nameList, "Account 0"]);
-            setVisibleWalletList([...visibleWalletList, true]);
-            setSelectedWalletIndex(walletList.length);
+            setWalletList([address]);
+            setNameList(["Account 0"]);
+            setVisibleWalletList([true]);
+            setSelectedWalletIndex(0);
             setNodeList(defaultNodeList);
             setName("Account 0");
             console.log("***** walletList length", walletList.length);
@@ -164,18 +166,41 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         }
     };
 
+    const addAccount = async (name: string | null): Promise<void> => {
+        try {
+            const rootNode = ethers.HDNodeWallet.fromPhrase(seedPhrase || "", "", "m/44'/2070'/0");
+            const index = walletList.length;
+            const childNode = rootNode.derivePath(`0/${index}`);
+            const sha256 = ethers.sha256(childNode.publicKey).slice(2);
+            const ripemd160 = ethers.ripemd160("0x" + sha256).slice(2);
+            const checksum = ethers.sha256("0x" + ripemd160).slice(2, 10);
+            const address = ripemd160 + checksum;
+
+            // save to storage
+            setWallet(address);
+            setWalletList([...walletList, address]);
+            setNameList([...nameList, name || `Account ${index}`]);
+            setVisibleWalletList([...visibleWalletList, true]);
+            setSelectedWalletIndex(index);
+            setName(name || `Account ${index}`);
+            console.log("***** walletList length", walletList.length);
+
+            console.log("-------------- End of add account --------------");
+
+        } catch (error) {
+            console.log("Error adding new account:", error);
+        }
+    }
+
     const importWallet = (seedPhrase: string): void => {
         console.log("-------------- importWallet --------------");
         // mnemonic 12 words
         const mnemonic = seedPhrase;
 
         // generate key pair
-        const ec = new elliptic.ec("secp256k1");
-        const key = ec.genKeyPair({ entropy: bip39.mnemonicToSeedSync(mnemonic, "account0") });
-
-        // generate address
-        const publicKey = key.getPublic().encode("hex", true);
-        const sha256 = ethers.sha256("0x" + publicKey).slice(2);
+        const rootNode = ethers.HDNodeWallet.fromPhrase(mnemonic, "", "m/44'/2070'/0");
+        const childNode = rootNode.derivePath("0/0");
+        const sha256 = ethers.sha256(childNode.publicKey).slice(2);
         const ripemd160 = ethers.ripemd160("0x" + sha256).slice(2);
         const checksum = ethers.sha256("0x" + ripemd160).slice(2, 10);
         const address = ripemd160 + checksum;
@@ -184,10 +209,10 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         // save to storage
         setSeedPhrase(mnemonic);
         setWallet(address);
-        setWalletList([...walletList, address]);
-        setNameList([...nameList, "Account 0"]);
-        setVisibleWalletList([...visibleWalletList, true]);
-        setSelectedWalletIndex(walletList.length);
+        setWalletList([address]);
+        setNameList(["Account 0"]);
+        setVisibleWalletList([true]);
+        setSelectedWalletIndex(0);
         setNodeList(defaultNodeList);
         console.log("defaultNodeList", defaultNodeList)
         setName("Account 0");
@@ -212,10 +237,9 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     };
 
     const getPrivateKeyFromIndex = (index: number): string => {
-        const ec = new elliptic.ec("secp256k1");
-
-        const key = ec.genKeyPair({ entropy: bip39.mnemonicToSeedSync(seedPhrase || "", `account${index}`) });
-        return key.getPrivate().toString("hex");
+        const rootNode = ethers.HDNodeWallet.fromPhrase(seedPhrase || "", "", "m/44'/2070'/0");
+        const childNode = rootNode.derivePath(`0/${index}`);
+        return childNode.privateKey.slice(2);
     };
 
     const setSeedPhrase = (seedPhrase: string): void => {
@@ -339,6 +363,7 @@ export const WalletProvider: React.FC<{ children: ReactNode }> = ({ children }) 
                 setToken,
                 clearToken,
                 newWallet,
+                addAccount,
                 setWalletListState,
                 setNodeListState,
                 setNameListState,
