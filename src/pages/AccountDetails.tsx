@@ -28,7 +28,7 @@ function useDebounce(value: string | null, delay: number): string | null {
 }
 
 function AccountDetails() {
-    const { wallet, name, selectedWalletIndex, setName } = useWallet();
+    const { wallet, name, nameList, setNameList, selectedWalletIndex, setName } = useWallet();
     const [copyLabel, setCopyLabel] = useState("Copy");
     const [isEditing, setIsEditing] = useState(false);
     const [tempName, setTempName] = useState<string | null>(name);
@@ -57,8 +57,9 @@ function AccountDetails() {
     useEffect(() => {
         if (debouncedName !== name) {
             setName(debouncedName || "");
+            setNameList(nameList.map((item, index) => index === selectedWalletIndex ? (debouncedName || "") : item ));
         }
-    }, [debouncedName, name, setName]);
+    }, [debouncedName, name, nameList, selectedWalletIndex, setName, setNameList]);
 
     return (
         <div className="min-h-screen container relative">
