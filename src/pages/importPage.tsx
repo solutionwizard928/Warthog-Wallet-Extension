@@ -71,7 +71,7 @@ function ImportPage() {
                         <div className={`flex justify-center items-center w-8 h-10 rounded-s-full pl-2 pr-1 ${isProcessing ? "bg-primary" : ""}`}>
                             <span className="text-white text-lg font-normal select-none">{index + 1}</span>
                         </div>
-                        <div className="w-[0.1px] h-10 bg-white/20" />
+                        <div className="w-[1px] h-10 bg-white/40" />
                         <input
                             type="text"
                             className="flex-grow text-center text-white text-lg font-normal bg-transparent focus:outline-none w-32"
