@@ -12,8 +12,11 @@ interface NodeType {
 
 function SelectNode() {
     const { nodeList, selectedNodeIndex, setSelectedNodeIndex, setNodeList } = useWallet();
-
+    
     const [nodes, setNodes] = useState<NodeType[]>([] as NodeType[]);
+    const [isDialogOpen, setIsDialogOpen] = useState(false); // State for dialog visibility
+    const [newNodeAddress, setNewNodeAddress] = useState("");
+    const [warnning, setWarnning] = useState(false);
 
     const [searchQuery, setSearchQuery] = useState("");
 
@@ -35,6 +38,29 @@ function SelectNode() {
         setNodeList(nodeList.filter((_, index) => index !== id));
         if( selectedNodeIndex === len - 1 )
             setSelectedNodeIndex( Math.max(len - 2, 0) );
+    }
+
+
+    const handleAddNode = () => {
+        // Logic to add the new node
+        console.log("Adding node:", newNodeAddress);
+        if( newNodeAddress.length == 0 ){
+            setWarnning(true);
+            return ;
+        }
+
+        const len = nodeList.length;
+        setNodeList([...nodeList, newNodeAddress])
+        setSelectedNodeIndex(len);
+
+        // Reset the input and close the dialog
+        setNewNodeAddress("");
+        setIsDialogOpen(false);
+    };
+
+    const handleCancel = () => {
+        setNewNodeAddress("");
+        setIsDialogOpen(false);
     }
 
     useEffect(() => {
@@ -84,12 +110,46 @@ function SelectNode() {
                 <Button
                     variant="primary"
                     ariaLabel="Add Node"
-                    onClick={() => console.log("Add Node")}
+                    onClick={() => setIsDialogOpen(true)}
                     className="w-full"
                 >
                     + Add more nodes
                 </Button>
             </div>
+            {/* Popup Dialog */}
+            {isDialogOpen && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-[#1A1A1A] p-4 rounded shadow-lg w-[300px]">
+                        <h3 className="text-white text-xl font-semibold mb-4">Add new Node</h3>
+                        <input
+                            type="text"
+                            placeholder="Node Address"
+                            value={newNodeAddress}
+                            onChange={(e) => setNewNodeAddress(e.target.value)}
+                            className="w-full min-w-[150px] bg-[#2A2A2A] border border-primary/25 rounded-lg p-3 text-white focus:outline-none focus:border-primary"
+                        />
+                        {
+                            warnning && <p className="text-red-500 text-xs mt-1">You have to input node address</p>
+                        }
+                        <div className="flex justify-end mt-4">
+                            <Button
+                                variant="secondary"
+                                onClick={handleCancel} // Close dialog
+                                className="mr-2 w-full"
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                variant="primary"
+                                onClick={handleAddNode} // Add node
+                                className="w-full"
+                            >
+                                Add
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
