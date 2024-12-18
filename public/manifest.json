@@ -4,21 +4,26 @@
   "version": "1.0",
   "description": "WARTHOG NETWORK A Chrome Extension for managing cryptocurrency wallets and facilitating secure transactions.",
   "icons": {
-    "16": "/logo.png",
-    "32": "/logo.png",
-    "48": "/logo.png",
-    "128": "/logo.png"
+    "16": "/logo-16.png",
+    "32": "/logo-32.png",
+    "48": "/logo-48.png",
+    "128": "/logo-128.png"
   },
   "action": {
     "default_popup": "index.html",
     "default_title": "WARTHOG NETWORK",
     "default_icon": {
-      "16": "/logo.png",
-      "32": "/logo.png"
+      "16": "/logo-16.png",
+      "32": "/logo-32.png"
     }
   },
-  "permissions": ["tabs", "storage", "scripting", "activeTab", "cookies", "storage"],
+  "permissions": ["tabs", "storage", "scripting", "activeTab", "cookies"],
   "host_permissions": ["*://*/*", "<all_urls>"],
   "options_page": "index.html",
-  "homepage_url": "https://warthog.network"
+  "homepage_url": "https://wartscan.io/",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "shinjirohara2@gmail.com"
+    }
+  }
 }

@@ -69,14 +69,14 @@ const ValidateIntro: React.FC<ValidateIntroProps> = ({ recoveryPhrase, onGoBack,
                 ? 'Perfect. Make sure to securely store your recovery phrase.'
                 : errors.some(error => error)
                     ? 'Sorry, that’s not correct. Please try again.'
-                    : 'Tap the words in the correct order.'} />
+                    : 'Repeat the words.'} />
             <div className="grid grid-cols-2 justify-start items-start gap-5 my-5">
                 {recoveryPhrase.map((_, index) => (
                     <div key={index} className={`bg-primary/20 rounded-full justify-start items-center inline-flex`}>
                         <div className={`justify-center items-center flex w-8 h-10 rounded-s-full pl-2 pr-1 ${errors[index] ? 'bg-error' : ''} ${isProcessing ? 'bg-primary' : ''}`}>
                             <span className="text-center text-white text-lg font-normal select-none">{index + 1}</span>
                         </div>
-                        <div className="w-[0.1px] h-10 bg-white/20" />
+                        <div className="w-[1px] h-10 bg-white/40" />
                         <div className="flex-grow justify-center items-center flex">
                             <input
                                 type="text"
